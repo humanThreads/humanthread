@@ -8,6 +8,13 @@ files:
   - dist-electron/**/*
   - package.json
   - "!node_modules/**/*"
+extraResources:
+  - from: ../../LICENSE
+    to: LICENSE
+  - from: ../../NOTICE
+    to: NOTICE
+  - from: ../../THIRD-PARTY-NOTICES.md
+    to: THIRD-PARTY-NOTICES.md
 asar: true
 protocols:
   - name: HumanThread

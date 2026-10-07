@@ -147,15 +147,25 @@ pnpm --filter @humanthread/mobile-android build:apk
 
 ## 许可证
 
-Copyright (C) 2026 HumanThread contributors
-
-本项目采用 **AGPL-3.0** 许可，完整条款见 [LICENSE](LICENSE)。
+Copyright (C) 2026 HumanThread contributors。本项目采用 **AGPL-3.0** 许可，完整条款见 [LICENSE](LICENSE)。
 
 以 AGPL-3.0 授权，你可以自由使用、修改和分发本项目。主要义务是：
 
 - 分发本项目或其修改版时，必须提供完整源代码并保留许可证与版权声明。
 - **通过网络向用户提供修改版服务时，必须向这些用户提供对应的完整源代码**（AGPL 第 13 条）。
 - 修改后的版本必须继续以 AGPL-3.0 授权。
+
+### 二进制与对应源码
+
+本项目发布的客户端与镜像产物同样适用 AGPL-3.0：
+
+| 产物 | 对应源码 |
+| --- | --- |
+| Desktop / Android / 容器镜像 | <https://github.com/humanThreads/humanthread> 对应标签或提交 |
+
+- 发布产物与源码提交一一对应，产物内附带 [NOTICE](NOTICE) 与 [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md)。
+- 重新分发二进制时，必须同时提供或书面承诺提供与二进制完全对应的源码。
+- 第三方组件清单可由 `pnpm licenses list --prod --json` 按 `pnpm-lock.yaml` 复现。
 
 ## 贡献
 

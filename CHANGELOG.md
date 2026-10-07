@@ -39,3 +39,12 @@
 - Android 正式签名依赖 `HUMANTHREAD_ANDROID_KEYSTORE_*` 注入，未注入时产物为未签名包。
 - Windows Desktop 产物未签名。
 - 知识索引服务的 Embedding 模型需要在本机下载或预置后再启动。
+
+### 发布产物
+
+| 产物 | 文件 | SHA-256 |
+| --- | --- | --- |
+| Desktop macOS arm64 | `HumanThread-Desktop-0.1.5-mac-arm64.dmg` | 见 Release 说明 |
+| Android universal | `HumanThread-0.1.5-android.apk` | 见 Release 说明 |
+
+产物随附 [NOTICE](NOTICE) 与 [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md)，对应源码见 <https://github.com/humanThreads/humanthread>。

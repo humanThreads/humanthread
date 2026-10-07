@@ -32,7 +32,6 @@
     "publish:linux-dev": "node --experimental-strip-types ./scripts/publish-linux-dev.ts"
   },
   "dependencies": {
-    "@anthropic-ai/claude-agent-sdk": "0.3.216",
     "@humanthread/project-loop-sync": "workspace:*",
     "@humanthread/live-session-journal": "workspace:*",
     "@humanthread/shared": "workspace:*",
