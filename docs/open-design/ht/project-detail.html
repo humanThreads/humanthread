@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HumanThread Web - 项目详情</title>
+  <link rel="stylesheet" href="assets/base.css">
+</head>
+<body>
+<div class="app-shell">
+  <header class="topbar">
+    <a class="brand" href="workspace.html"><span class="brand-mark"></span><span>HumanThread Web</span></a>
+    <div class="search"><input value="Q2 重点项目池" aria-label="项目" readonly></div>
+    <div class="top-actions">
+      <a class="btn btn-primary" href="#">新建任务 / 工作流</a>
+      <a class="btn" href="#">新建文档</a>
+      <a class="btn" href="#">编辑项目</a>
+      <a class="btn" href="#">打开本地目录</a>
+    </div>
+  </header>
+  <main class="content">
+    <div class="page-head">
+      <div>
+        <h1 class="page-title">Q2 重点项目池</h1>
+        <p class="page-subtitle">项目下任务、文档、工作流入口集中在同一层级，便于快速跳转和管理。</p>
+      </div>
+    </div>
+    <div class="grid cols-2">
+      <section class="panel">
+        <div class="panel-head"><h2 class="panel-title">任务</h2><a class="btn btn-small" href="workspace.html">回到工作台</a></div>
+        <div class="list">
+          <div class="row"><div><p class="title">整理里程碑</p><div class="meta">负责人：陈然 · 进行中</div></div><span class="pill pill-blue">当前</span></div>
+          <div class="row"><div><p class="title">更新依赖图</p><div class="meta">负责人：刘瑶 · 待开始</div></div><span class="pill">待处理</span></div>
+          <div class="row"><div><p class="title">同步评审结论</p><div class="meta">负责人：张一 · 阻塞</div></div><span class="pill pill-danger">阻塞</span></div>
+        </div>
+      </section>
+      <section class="stack">
+        <div class="panel">
+          <div class="panel-head"><h2 class="panel-title">文档</h2><a class="btn btn-small" href="document-detail.html">查看全部文档</a></div>
+          <div class="panel-body">
+            <div class="stack">
+              <div class="mini-item"><strong>项目章程.md</strong><span class="help">最新版本 14</span></div>
+              <div class="mini-item"><strong>里程碑说明.md</strong><span class="help">已链接到工作流</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><h2 class="panel-title">工作流</h2></div>
+          <div class="panel-body">
+            <div class="timeline">
+              <div class="timeline-item"><div class="timeline-dot"></div><div><strong>评审</strong><div class="help">当前节点 · 等待确认</div></div></div>
+              <div class="timeline-item"><div class="timeline-dot gray"></div><div><strong>执行</strong><div class="help">后续节点</div></div></div>
+              <div class="timeline-item"><div class="timeline-dot gray"></div><div><strong>收尾</strong><div class="help">文档归档与复盘</div></div></div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+<script src="assets/base.js"></script>
+</body>
+</html>

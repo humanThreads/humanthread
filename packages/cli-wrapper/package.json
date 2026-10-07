@@ -1,0 +1,37 @@
+{
+  "name": "@humanthread/cli-wrapper",
+  "version": "0.1.2",
+  "license": "AGPL-3.0-only",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "ht": "./dist/ht-cli.js",
+    "ht-run": "./dist/cli.js"
+  },
+  "scripts": {
+    "prebuild": "pnpm --filter @humanthread/live-session-journal build && pnpm --filter @humanthread/project-loop-sync build",
+    "build": "tsc -p tsconfig.json && node ../../scripts/fix-node-esm-specifiers.mjs dist",
+    "prelint": "pnpm --filter @humanthread/live-session-journal build && pnpm --filter @humanthread/project-loop-sync build",
+    "lint": "tsc -p tsconfig.json --noEmit",
+    "pretest": "pnpm --filter @humanthread/live-session-journal build && pnpm --filter @humanthread/project-loop-sync build",
+    "test": "vitest run",
+    "pretypecheck": "pnpm --filter @humanthread/live-session-journal build && pnpm --filter @humanthread/project-loop-sync build",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "package:release": "node ./scripts/package-release.mjs"
+  },
+  "dependencies": {
+    "@humanthread/live-session-journal": "workspace:*",
+    "@humanthread/shared": "workspace:*",
+    "@humanthread/project-loop-sync": "workspace:*",
+    "ws": "8.18.3"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.41",
+    "@types/ws": "8.18.1",
+    "esbuild": "^0.27.0",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.16"
+  }
+}

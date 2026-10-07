@@ -1,0 +1,2566 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model Team {
+  id                String             @id @db.VarChar(64)
+  name              String             @db.VarChar(191)
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  users             User[]
+  projects          Project[]
+  matterTypes       MatterType[]
+  workflowTemplates WorkflowTemplate[]
+  workflowInstances WorkflowInstance[]
+  tasks             Task[]
+}
+
+model Company {
+  id                 String              @id @db.VarChar(64)
+  name               String              @db.VarChar(191)
+  slug               String              @unique @db.VarChar(128)
+  status             String              @db.VarChar(32)
+  description        String?             @db.Text
+  logoUrl            String?             @db.VarChar(512)
+  certificationLevel String              @default("normal") @db.VarChar(32)
+  emailHost          String?             @db.VarChar(191)
+  emailPort          Int?
+  emailUsername      String?             @db.VarChar(191)
+  emailPassword      String?             @db.VarChar(191)
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  members            CompanyMember[]
+  invitations        CompanyInvitation[]
+  projects           Project[]
+  space              Space?
+  workerPools        WorkerPool[]
+  workerModelSites   WorkerModelSite[]
+  workerImageSources WorkerImageSource[]
+}
+
+model CompanyMember {
+  id        String   @id @db.VarChar(96)
+  companyId String   @db.VarChar(64)
+  userId    String   @db.VarChar(64)
+  role      String   @db.VarChar(32)
+  status    String   @db.VarChar(32)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  company   Company  @relation(fields: [companyId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@unique([companyId, userId])
+  @@index([userId, status])
+}
+
+model CompanyInvitation {
+  id           String    @id @db.VarChar(128)
+  companyId    String    @db.VarChar(64)
+  email        String    @db.VarChar(191)
+  role         String    @db.VarChar(32)
+  status       String    @db.VarChar(32)
+  invitedById  String    @db.VarChar(64)
+  acceptedById String?   @db.VarChar(64)
+  expiresAt    DateTime
+  acceptedAt   DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  company      Company   @relation(fields: [companyId], references: [id])
+  invitedBy    User      @relation("CompanyInvitationInvitedBy", fields: [invitedById], references: [id])
+  acceptedBy   User?     @relation("CompanyInvitationAcceptedBy", fields: [acceptedById], references: [id])
+
+  @@unique([companyId, email])
+  @@index([email, status, expiresAt])
+  @@index([invitedById, createdAt])
+  @@index([acceptedById, acceptedAt])
+}
+
+model User {
+  id                                 String                          @id @db.VarChar(64)
+  teamId                             String                          @db.VarChar(64)
+  name                               String                          @db.VarChar(191)
+  email                              String?                         @unique @db.VarChar(191)
+  status                             String                          @db.VarChar(32)
+  passwordHash                       String?                         @db.VarChar(191)
+  agentApiTokenHash                  String?                         @db.VarChar(191)
+  avatarUrl                          String?                         @db.VarChar(512)
+  avatarUpdatedAt                    DateTime?
+  isSiteAdmin                        Boolean                         @default(false)
+  lastSeenAt                         DateTime?
+  createdAt                          DateTime                        @default(now())
+  updatedAt                          DateTime                        @updatedAt
+  team                               Team                            @relation(fields: [teamId], references: [id])
+  assignedTasks                      Task[]                          @relation("TaskAssignee")
+  createdWorkflows                   WorkflowInstance[]              @relation("WorkflowCreatedBy")
+  localDevices                       LocalDevice[]
+  desktopSessions                    DesktopSession[]
+  webSessions                        WebSession[]
+  desktopWebHandoffs                 DesktopWebHandoff[]
+  companyMemberships                 CompanyMember[]
+  sentCompanyInvitations             CompanyInvitation[]             @relation("CompanyInvitationInvitedBy")
+  acceptedCompanyInvitations         CompanyInvitation[]             @relation("CompanyInvitationAcceptedBy")
+  projectMemberships                 ProjectMember[]
+  personalProjects                   Project[]                       @relation("PersonalProjectOwner")
+  createdDocuments                   Document[]                      @relation("DocumentCreatedBy")
+  updatedDocuments                   Document[]                      @relation("DocumentUpdatedBy")
+  deletedDocuments                   Document[]                      @relation("DocumentDeletedBy")
+  documentRevisions                  DocumentRevision[]              @relation("DocumentRevisionCreatedBy")
+  createdDocumentDirectories         DocumentDirectory[]             @relation("DocumentDirectoryCreatedBy")
+  updatedDocumentDirectories         DocumentDirectory[]             @relation("DocumentDirectoryUpdatedBy")
+  uploadedDocumentAttachments        DocumentAttachment[]            @relation("DocumentAttachmentUploadedBy")
+  mcpCredentials                     McpCredential[]
+  registrationEmailVerifications     RegistrationEmailVerification[]
+  notificationReads                  WorkbenchNotificationRead[]
+  personalSpace                      Space?                          @relation("PersonalSpaceOwner")
+  createdTasks                       Task[]                          @relation("TaskCreatedBy")
+  acceptanceReviewTasks              Task[]                          @relation("TaskAcceptanceReviewer")
+  taskMemberships                    TaskMember[]
+  taskComments                       TaskComment[]
+  taskActivities                     TaskActivity[]
+  taskSavedViews                     TaskSavedView[]
+  createdTaskBlockers                TaskBlocker[]                   @relation("TaskBlockerCreatedBy")
+  ownedTaskBlockers                  TaskBlocker[]                   @relation("TaskBlockerOwner")
+  resolvedTaskBlockers               TaskBlocker[]                   @relation("TaskBlockerResolvedBy")
+  createdTaskLabels                  TaskLabel[]                     @relation("TaskLabelCreatedBy")
+  taskLabelAssignments               TaskLabelAssignment[]
+  taskDocumentLinks                  TaskDocumentLink[]
+  taskAttachments                    TaskAttachment[]
+  receivedTaskReminders              TaskReminder[]                  @relation("TaskReminderRecipient")
+  createdTaskReminders               TaskReminder[]                  @relation("TaskReminderCreatedBy")
+  createdTaskStatusDefinitions       TaskStatusDefinition[]          @relation("TaskStatusDefinitionCreatedBy")
+  ownedLoopDefinitions               LoopDefinition[]                @relation("LoopDefinitionOwner")
+  publishedLoopVersions              LoopVersion[]                   @relation("LoopVersionPublisher")
+  developmentTemplates               ProjectDevelopmentTemplate[]    @relation("DevelopmentTemplateCreatedBy")
+  createdProjectLoopBindings         ProjectLoopBinding[]            @relation("ProjectLoopBindingCreator")
+  createdAutomationGrants            AutomationGrant[]               @relation("AutomationGrantCreator")
+  projectDeviceWorkspaces            ProjectDeviceWorkspace[]
+  deviceAgentRuntimeProfiles         DeviceAgentRuntimeProfile[]
+  notificationIntents                NotificationIntent[]            @relation("NotificationIntentRecipient")
+  reviewedKnowledgeCandidates        KnowledgeCandidate[]            @relation("KnowledgeCandidateReviewer")
+  createdProjectTaskFieldDefinitions ProjectTaskFieldDefinition[]    @relation("ProjectTaskFieldDefinitionCreatedBy")
+  workflowInteractionMessages        WorkflowInteractionMessage[]    @relation("WorkflowInteractionMessageActor")
+  workflowInteractionAttachments     WorkflowInteractionAttachment[] @relation("WorkflowInteractionAttachmentUploader")
+  workflowInteractionMentions        WorkflowInteractionMention[]
+  workflowInteractionDecisions       WorkflowInteractionDecision[]   @relation("WorkflowInteractionDecisionActor")
+  workerPools                        WorkerPool[]                    @relation("WorkerPoolOwner")
+  workerPoolAudits                   WorkerPoolAudit[]               @relation("WorkerPoolAuditActor")
+  workerModelSites                   WorkerModelSite[]               @relation("WorkerModelSiteOwner")
+  createdWorkerImageSources          WorkerImageSource[]             @relation("WorkerImageSourceCreator")
+
+  @@index([teamId, status])
+}
+
+model Space {
+  id                    String                       @id @db.VarChar(96)
+  type                  String                       @db.VarChar(32)
+  ownerUserId           String?                      @unique @db.VarChar(64)
+  companyId             String?                      @unique @db.VarChar(64)
+  name                  String                       @db.VarChar(191)
+  status                String                       @default("active") @db.VarChar(32)
+  createdAt             DateTime                     @default(now())
+  updatedAt             DateTime                     @updatedAt
+  ownerUser             User?                        @relation("PersonalSpaceOwner", fields: [ownerUserId], references: [id])
+  company               Company?                     @relation(fields: [companyId], references: [id])
+  projects              Project[]
+  documents             Document[]
+  documentDirectories   DocumentDirectory[]
+  agentProfiles         AgentProfile[]
+  agentWorkers          AgentWorker[]
+  tasks                 Task[]
+  taskStatusDefinitions TaskStatusDefinition[]
+  taskSavedViews        TaskSavedView[]
+  taskLabels            TaskLabel[]
+  loopDefinitions       LoopDefinition[]
+  developmentTemplates  ProjectDevelopmentTemplate[]
+  automationGrants      AutomationGrant[]
+
+  @@index([type, status])
+}
+
+model WorkbenchNotificationRead {
+  id             String   @id @db.VarChar(128)
+  userId         String   @db.VarChar(64)
+  notificationId String   @db.VarChar(191)
+  readAt         DateTime
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  user           User     @relation(fields: [userId], references: [id])
+
+  @@unique([userId, notificationId])
+  @@index([userId, readAt])
+}
+
+model SiteSetting {
+  key       String   @id @db.VarChar(96)
+  value     String   @db.VarChar(1024)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model RegistrationEmailVerification {
+  id         String    @id @db.VarChar(96)
+  email      String    @db.VarChar(191)
+  codeHash   String    @db.VarChar(64)
+  attempts   Int       @default(0)
+  expiresAt  DateTime
+  consumedAt DateTime?
+  createdAt  DateTime  @default(now())
+  userId     String?   @db.VarChar(64)
+  user       User?     @relation(fields: [userId], references: [id])
+
+  @@index([email, createdAt])
+  @@index([email, consumedAt, expiresAt])
+}
+
+model Project {
+  id                              String                       @id @db.VarChar(64)
+  teamId                          String                       @db.VarChar(64)
+  spaceId                         String?                      @db.VarChar(96)
+  ownerType                       String                       @default("company") @db.VarChar(32)
+  companyId                       String?                      @db.VarChar(64)
+  ownerUserId                     String?                      @db.VarChar(64)
+  visibility                      String                       @default("private") @db.VarChar(32)
+  name                            String                       @db.VarChar(191)
+  description                     String?                      @db.Text
+  orchestrationStatus             String?                      @db.VarChar(32)
+  objective                       String?                      @db.Text
+  managerUserId                   String?                      @db.VarChar(64)
+  shortCode                       String?                      @db.VarChar(12)
+  nextTaskNumber                  Int                          @default(100001)
+  startAt                         DateTime?
+  targetAt                        DateTime?
+  completedAt                     DateTime?
+  orchestrationPolicyId           String?                      @db.VarChar(96)
+  developmentTemplateKey          String?                      @db.VarChar(96)
+  developmentTemplateVersion      Int?
+  developmentTemplateConfig       Json?
+  /// Project-owned Loop group snapshot; template changes do not mutate this value.
+  loopGroupConfig                 Json?
+  productionBranch                String?                      @db.VarChar(191)
+  stagingBranch                   String?                      @db.VarChar(191)
+  releaseAgentProfileId           String?                      @db.VarChar(96)
+  workerPoolId                    String?                      @db.Char(32)
+  workerRepositoryUrl             String?                      @db.VarChar(1024)
+  workerBranchPolicy              Json?
+  /// Provider, auth mode and verification metadata for the project Git repository. Values are never persisted here.
+  repositoryConfiguration         Json?
+  /// Worker image metadata; deployments always use the immutable digest.
+  workerImageRepository           String?                      @db.VarChar(1024)
+  workerImageTag                  String?                      @db.VarChar(191)
+  workerImageDigest               String?                      @db.Char(71)
+  workerImageResolvedAt           DateTime?
+  /// Immutable Worker image selected from the platform image catalog.
+  workerImageVersionId            String?                      @db.Char(32)
+  /// Versioned Kubernetes/Docker deployment settings selected by this Project.
+  workerDeploymentConfiguration   Json?
+  /// Project-wide execution credential metadata; values are never persisted here.
+  environmentConfiguration        Json?
+  environmentConfigurationVersion Int                          @default(1)
+  version                         Int                          @default(1)
+  localPath                       String?                      @db.VarChar(512)
+  defaultCommand                  String?                      @db.VarChar(191)
+  createdAt                       DateTime                     @default(now())
+  updatedAt                       DateTime                     @updatedAt
+  team                            Team                         @relation(fields: [teamId], references: [id])
+  space                           Space?                       @relation(fields: [spaceId], references: [id])
+  company                         Company?                     @relation(fields: [companyId], references: [id])
+  ownerUser                       User?                        @relation("PersonalProjectOwner", fields: [ownerUserId], references: [id])
+  developmentTemplate             ProjectDevelopmentTemplate?  @relation(fields: [developmentTemplateKey, developmentTemplateVersion], references: [key, version])
+  workerPool                      WorkerPool?                  @relation("ProjectWorkerPool", fields: [workerPoolId], references: [id])
+  workerImageVersion              WorkerImageVersion?          @relation("ProjectWorkerImageVersion", fields: [workerImageVersionId], references: [id])
+  workerValidationChallenges      WorkerValidationChallenge[]
+  members                         ProjectMember[]
+  documents                       Document[]
+  documentDirectories             DocumentDirectory[]
+  workflowInstances               WorkflowInstance[]
+  tasks                           Task[]
+  stages                          ProjectStage[]
+  milestones                      Milestone[]
+  taskDependencies                TaskDependency[]
+  checkDefinitions                CheckDefinition[]
+  workflowDefinitionVersions      WorkflowDefinitionVersion[]
+  workspaces                      Workspace[]
+  approvalRequests                ApprovalRequest[]
+  artifacts                       Artifact[]
+  taskStatusDefinitions           TaskStatusDefinition[]
+  agentRuns                       AgentRun[]
+  loopRuns                        LoopRun[]
+  loopBindings                    ProjectLoopBinding[]
+  automationGrants                AutomationGrant[]
+  notificationIntents             NotificationIntent[]
+  knowledgeCandidates             KnowledgeCandidate[]
+  deviceWorkspaces                ProjectDeviceWorkspace[]
+  taskFieldDefinitions            ProjectTaskFieldDefinition[]
+  milestoneReleaseSnapshots       MilestoneReleaseSnapshot[]
+  workflowInteractions            WorkflowInteraction[]
+
+  @@unique([teamId, shortCode])
+  @@index([teamId, name])
+  @@index([spaceId, name])
+  @@index([companyId, name])
+  @@index([ownerUserId, name])
+  @@index([workerPoolId])
+}
+
+/// Project-owned HumanThread managed environment secret. Values are encrypted at rest and never exposed by management reads.
+model ProjectEnvironmentSecret {
+  id               String    @id @db.Char(32)
+  projectDigest    String    @db.Char(32)
+  name             String    @db.VarChar(191)
+  encryptedValue   String    @db.Text
+  valueFingerprint String    @db.Char(64)
+  status           String    @default("active") @db.VarChar(32)
+  version          Int       @default(1)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  revokedAt        DateTime?
+
+  @@unique([projectDigest, name])
+  @@index([projectDigest, status])
+}
+
+model ProjectDevelopmentTemplate {
+  id                       String    @id @db.VarChar(96)
+  key                      String    @db.VarChar(96)
+  name                     String    @db.VarChar(191)
+  version                  Int
+  status                   String    @db.VarChar(32)
+  spaceId                  String?   @db.VarChar(96)
+  origin                   String    @default("platform") @db.VarChar(16)
+  kind                     String    @default("branch-development") @db.VarChar(96)
+  description              String?   @db.Text
+  createdByUserId          String?   @db.VarChar(64)
+  sourceTemplateId         String?   @db.VarChar(96)
+  revision                 Int       @default(1)
+  projectConfigSchema      Json
+  taskFieldSchema          Json
+  developmentLoopVersionId String?   @db.VarChar(96)
+  releaseLoopVersionId     String?   @db.VarChar(96)
+  triggerPolicy            Json
+  executionPolicy          Json
+  loopGroupConfig          Json?
+  isPublic                 Boolean   @default(false)
+  publicAt                 DateTime?
+  deletedAt                DateTime?
+  industryTags             Json?
+  starCount                Int       @default(0)
+  createdAt                DateTime  @default(now())
+  updatedAt                DateTime  @updatedAt
+  space                    Space?    @relation(fields: [spaceId], references: [id])
+  createdBy                User?     @relation("DevelopmentTemplateCreatedBy", fields: [createdByUserId], references: [id])
+  projects                 Project[]
+
+  @@unique([key, version])
+  @@index([key, status])
+  @@index([spaceId, status, updatedAt])
+  @@index([origin, status, updatedAt])
+  @@index([isPublic, deletedAt, publicAt])
+  @@index([isPublic, deletedAt, starCount])
+}
+
+model DevelopmentTemplateMarketStar {
+  id             String   @id @db.Char(32)
+  templateDigest String   @db.Char(32)
+  userDigest     String   @db.Char(32)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@unique([templateDigest, userDigest])
+  @@index([templateDigest, createdAt])
+}
+
+model MilestoneReleaseSnapshot {
+  id                   String   @id @db.VarChar(96)
+  projectId            String   @db.VarChar(64)
+  milestoneId          String   @db.VarChar(96)
+  loopRunId            String   @unique @db.VarChar(96)
+  triggerType          String   @db.VarChar(32)
+  snapshot             Json
+  checksum             String   @db.VarChar(128)
+  stagingBaseCommit    String   @db.VarChar(64)
+  productionBaseCommit String   @db.VarChar(64)
+  createdAt            DateTime @default(now())
+  project              Project  @relation(fields: [projectId], references: [id])
+  loopRun              LoopRun  @relation(fields: [loopRunId], references: [id])
+
+  @@index([projectId, milestoneId, createdAt])
+}
+
+model ReleasePlan {
+  id               String            @id @db.Char(32)
+  projectId        String            @db.Char(32)
+  name             String            @db.VarChar(191)
+  status           String            @db.VarChar(32)
+  loopRunId        String?           @unique @db.Char(32)
+  selectedSnapshot Json
+  failureReason    String?           @db.Text
+  retryOfId        String?           @db.Char(32)
+  createdById      String            @db.Char(32)
+  startedAt        DateTime?
+  completedAt      DateTime?
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  tasks            ReleasePlanTask[]
+
+  @@index([projectId, status, createdAt])
+  @@index([retryOfId])
+}
+
+model ReleasePlanTask {
+  id            String      @id @db.Char(32)
+  releasePlanId String      @db.Char(32)
+  taskId        String      @db.Char(32)
+  milestoneId   String?     @db.Char(32)
+  stageId       String?     @db.Char(32)
+  taskTitle     String      @db.VarChar(191)
+  status        String      @db.VarChar(32)
+  createdAt     DateTime    @default(now())
+  releasePlan   ReleasePlan @relation(fields: [releasePlanId], references: [id])
+
+  @@unique([releasePlanId, taskId])
+  @@index([taskId, status])
+}
+
+model ProjectMember {
+  id        String   @id @db.VarChar(96)
+  projectId String   @db.VarChar(64)
+  userId    String   @db.VarChar(64)
+  role      String   @db.VarChar(32)
+  status    String   @db.VarChar(32)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  project   Project  @relation(fields: [projectId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@unique([projectId, userId])
+  @@index([userId, status])
+}
+
+model Document {
+  id                     String               @id @db.VarChar(96)
+  spaceId                String?              @db.VarChar(96)
+  projectId              String?              @db.VarChar(64)
+  containerKey           String?              @db.VarChar(191)
+  directoryId            String?              @db.VarChar(96)
+  title                  String               @db.VarChar(191)
+  path                   String               @db.VarChar(512)
+  contentMarkdown        String               @db.LongText
+  format                 String               @default("markdown") @db.VarChar(16)
+  version                Int
+  sortOrder              Int                  @default(0)
+  deletedAt              DateTime?
+  deletedById            String?              @db.VarChar(64)
+  deletedFromPath        String?              @db.VarChar(512)
+  deletedFromDirectoryId String?              @db.VarChar(96)
+  createdById            String               @db.VarChar(64)
+  updatedById            String               @db.VarChar(64)
+  createdAt              DateTime             @default(now())
+  updatedAt              DateTime             @updatedAt
+  space                  Space?               @relation(fields: [spaceId], references: [id])
+  project                Project?             @relation(fields: [projectId], references: [id])
+  directory              DocumentDirectory?   @relation(fields: [directoryId], references: [id])
+  createdBy              User                 @relation("DocumentCreatedBy", fields: [createdById], references: [id])
+  updatedBy              User                 @relation("DocumentUpdatedBy", fields: [updatedById], references: [id])
+  deletedBy              User?                @relation("DocumentDeletedBy", fields: [deletedById], references: [id])
+  revisions              DocumentRevision[]
+  attachments            DocumentAttachment[]
+  taskLinks              TaskDocumentLink[]
+
+  @@unique([projectId, path])
+  @@unique([containerKey, path])
+  @@index([spaceId, updatedAt])
+  @@index([projectId, updatedAt])
+  @@index([directoryId, sortOrder])
+  @@index([containerKey, deletedAt, sortOrder])
+  @@map("ProjectDocument")
+}
+
+model DocumentPermission {
+  id              String    @id @db.Char(32)
+  spaceDigest     String    @db.Char(32)
+  documentDigest  String?   @db.Char(32)
+  directoryDigest String?   @db.Char(32)
+  userDigest      String    @db.Char(32)
+  permission      String    @db.VarChar(16)
+  createdByDigest String    @db.Char(32)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  revokedAt       DateTime?
+
+  @@unique([spaceDigest, documentDigest, directoryDigest, userDigest])
+  @@index([spaceDigest, userDigest, revokedAt])
+  @@index([documentDigest, userDigest, revokedAt])
+  @@index([directoryDigest, userDigest, revokedAt])
+}
+
+model DocumentDirectory {
+  id           String              @id @db.VarChar(96)
+  spaceId      String              @db.VarChar(96)
+  projectId    String?             @db.VarChar(64)
+  containerKey String              @db.VarChar(191)
+  parentId     String?             @db.VarChar(96)
+  name         String              @db.VarChar(191)
+  path         String              @db.VarChar(512)
+  sortOrder    Int                 @default(0)
+  createdById  String              @db.VarChar(64)
+  updatedById  String              @db.VarChar(64)
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
+  space        Space               @relation(fields: [spaceId], references: [id])
+  project      Project?            @relation(fields: [projectId], references: [id])
+  parent       DocumentDirectory?  @relation("DocumentDirectoryTree", fields: [parentId], references: [id])
+  children     DocumentDirectory[] @relation("DocumentDirectoryTree")
+  documents    Document[]
+  createdBy    User                @relation("DocumentDirectoryCreatedBy", fields: [createdById], references: [id])
+  updatedBy    User                @relation("DocumentDirectoryUpdatedBy", fields: [updatedById], references: [id])
+
+  @@unique([containerKey, path])
+  @@index([parentId, sortOrder])
+  @@index([spaceId, projectId])
+}
+
+model DocumentAttachment {
+  id           String    @id @db.VarChar(96)
+  documentId   String    @db.VarChar(96)
+  storageKey   String    @unique @db.VarChar(512)
+  originalName String    @db.VarChar(255)
+  mimeType     String    @db.VarChar(191)
+  byteSize     BigInt
+  uploadedById String    @db.VarChar(64)
+  createdAt    DateTime  @default(now())
+  deletedAt    DateTime?
+  document     Document  @relation(fields: [documentId], references: [id])
+  uploadedBy   User      @relation("DocumentAttachmentUploadedBy", fields: [uploadedById], references: [id])
+
+  @@index([documentId, deletedAt, createdAt])
+}
+
+model DocumentRevision {
+  id              String   @id @db.VarChar(128)
+  documentId      String   @db.VarChar(96)
+  version         Int
+  contentMarkdown String   @db.LongText
+  createdById     String   @db.VarChar(64)
+  source          String   @db.VarChar(32)
+  createdAt       DateTime @default(now())
+  document        Document @relation(fields: [documentId], references: [id])
+  createdBy       User     @relation("DocumentRevisionCreatedBy", fields: [createdById], references: [id])
+
+  @@unique([documentId, version])
+  @@index([documentId, createdAt])
+}
+
+model McpCredential {
+  id         String    @id @db.VarChar(96)
+  userId     String    @db.VarChar(64)
+  name       String    @db.VarChar(191)
+  tokenHash  String    @db.VarChar(191)
+  status     String    @db.VarChar(32)
+  lastUsedAt DateTime?
+  createdAt  DateTime  @default(now())
+  revokedAt  DateTime?
+  user       User      @relation(fields: [userId], references: [id])
+
+  @@index([userId, status])
+  @@index([tokenHash])
+}
+
+model MatterType {
+  id                 String             @id @db.VarChar(64)
+  teamId             String             @db.VarChar(64)
+  name               String             @db.VarChar(191)
+  description        String?            @db.Text
+  workflowTemplateId String?            @db.VarChar(64)
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+  team               Team               @relation(fields: [teamId], references: [id])
+  workflowTemplate   WorkflowTemplate?  @relation(fields: [workflowTemplateId], references: [id])
+  workflowInstances  WorkflowInstance[]
+
+  @@index([teamId, name])
+}
+
+model WorkflowTemplate {
+  id                String                 @id @db.VarChar(64)
+  teamId            String                 @db.VarChar(64)
+  name              String                 @db.VarChar(191)
+  version           Int
+  firstStepKey      String                 @db.VarChar(128)
+  isActive          Boolean                @default(true)
+  createdAt         DateTime               @default(now())
+  updatedAt         DateTime               @updatedAt
+  team              Team                   @relation(fields: [teamId], references: [id])
+  stepTemplates     WorkflowStepTemplate[]
+  matterTypes       MatterType[]
+  workflowInstances WorkflowInstance[]
+
+  @@index([teamId, isActive])
+}
+
+model WorkflowStepTemplate {
+  id                 String           @id @db.VarChar(64)
+  workflowTemplateId String           @db.VarChar(64)
+  key                String           @db.VarChar(128)
+  title              String           @db.VarChar(191)
+  description        String           @db.Text
+  executorType       String           @db.VarChar(16)
+  assigneeUserId     String?          @db.VarChar(64)
+  nextStepKey        String?          @db.VarChar(128)
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+  workflowTemplate   WorkflowTemplate @relation(fields: [workflowTemplateId], references: [id])
+  tasks              Task[]
+
+  @@unique([workflowTemplateId, key])
+  @@index([workflowTemplateId])
+}
+
+model WorkflowInstance {
+  id                 String             @id @db.VarChar(64)
+  teamId             String             @db.VarChar(64)
+  projectId          String             @db.VarChar(64)
+  matterTypeId       String             @db.VarChar(64)
+  workflowTemplateId String             @db.VarChar(64)
+  title              String             @db.VarChar(191)
+  description        String?            @db.Text
+  status             String             @db.VarChar(32)
+  currentStepKey     String             @db.VarChar(128)
+  createdById        String             @db.VarChar(64)
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+  team               Team               @relation(fields: [teamId], references: [id])
+  project            Project            @relation(fields: [projectId], references: [id])
+  matterType         MatterType         @relation(fields: [matterTypeId], references: [id])
+  workflowTemplate   WorkflowTemplate   @relation(fields: [workflowTemplateId], references: [id])
+  createdBy          User               @relation("WorkflowCreatedBy", fields: [createdById], references: [id])
+  tasks              Task[]
+  taskEvents         TaskEvent[]
+  taskWorkflowLinks  TaskWorkflowLink[]
+
+  @@index([teamId, status])
+  @@index([projectId, createdAt])
+}
+
+model Task {
+  id                        String                @id @db.VarChar(96)
+  teamId                    String                @db.VarChar(64)
+  workflowInstanceId        String?               @db.VarChar(64)
+  projectId                 String?               @db.VarChar(64)
+  stepTemplateId            String?               @db.VarChar(64)
+  spaceId                   String                @db.VarChar(96)
+  createdById               String                @db.VarChar(64)
+  statusCategory            String                @db.VarChar(32)
+  statusDefinitionId        String?               @db.VarChar(96)
+  visibility                String                @db.VarChar(16)
+  title                     String                @db.VarChar(191)
+  description               String                @db.Text
+  contentMarkdown           String                @db.LongText
+  status                    String                @db.VarChar(32)
+  executorType              String                @db.VarChar(16)
+  assigneeUserId            String?               @db.VarChar(64)
+  queuePosition             Int
+  localPath                 String?               @db.VarChar(512)
+  command                   String?               @db.VarChar(191)
+  milestoneId               String?               @db.VarChar(96)
+  parentTaskId              String?               @db.VarChar(96)
+  objective                 String?               @db.Text
+  taskType                  String?               @db.VarChar(32)
+  taskNumber                Int?
+  shortId                   String?               @unique @db.VarChar(32)
+  taskBranch                String?               @db.VarChar(191)
+  taskBranchAssignedAt      DateTime?
+  taskBranchAssignedByActor String?               @db.VarChar(191)
+  /// Linux Worker affinity is fixed on first claim so retries and child Loops stay in the same container.
+  linuxWorkerPoolId         String?               @db.Char(32)
+  linuxWorkerInstanceId     String?               @db.VarChar(191)
+  priority                  Int                   @default(0)
+  startAt                   DateTime?
+  dueAt                     DateTime?
+  acceptanceMode            String                @db.VarChar(16)
+  acceptanceReviewerId      String?               @db.VarChar(64)
+  archivedAt                DateTime?
+  recurrenceRule            String?               @db.VarChar(512)
+  accountableUserId         String?               @db.VarChar(64)
+  executionMode             String?               @db.VarChar(16)
+  preferredAgentProfileId   String?               @db.VarChar(96)
+  capabilityRequirements    Json?
+  scopePolicy               Json?
+  acceptancePolicy          Json?
+  budgetPolicy              Json?
+  dispatchPolicy            Json?
+  currentLoopRunId          String?               @db.VarChar(96)
+  version                   Int                   @default(1)
+  startedAt                 DateTime?
+  completedAt               DateTime?
+  publishedAt               DateTime?
+  publicationStatus         String                @default("unreleased") @db.VarChar(16)
+  createdAt                 DateTime              @default(now())
+  updatedAt                 DateTime              @updatedAt
+  team                      Team                  @relation(fields: [teamId], references: [id])
+  workflowInstance          WorkflowInstance?     @relation(fields: [workflowInstanceId], references: [id])
+  project                   Project?              @relation(fields: [projectId], references: [id])
+  stepTemplate              WorkflowStepTemplate? @relation(fields: [stepTemplateId], references: [id])
+  space                     Space                 @relation(fields: [spaceId], references: [id])
+  createdBy                 User                  @relation("TaskCreatedBy", fields: [createdById], references: [id])
+  statusDefinition          TaskStatusDefinition? @relation(fields: [statusDefinitionId], references: [id])
+  acceptanceReviewer        User?                 @relation("TaskAcceptanceReviewer", fields: [acceptanceReviewerId], references: [id])
+  assignee                  User?                 @relation("TaskAssignee", fields: [assigneeUserId], references: [id])
+  events                    TaskEvent[]
+  toolSessions              ToolSession[]
+  milestone                 Milestone?            @relation(fields: [milestoneId], references: [id])
+  parentTask                Task?                 @relation("TaskHierarchy", fields: [parentTaskId], references: [id])
+  childTasks                Task[]                @relation("TaskHierarchy")
+  predecessorDependencies   TaskDependency[]      @relation("TaskDependencyPredecessor")
+  successorDependencies     TaskDependency[]      @relation("TaskDependencySuccessor")
+  checkDefinitions          CheckDefinition[]
+  agentRuns                 AgentRun[]
+  loopRuns                  LoopRun[]
+  approvalRequests          ApprovalRequest[]
+  artifacts                 Artifact[]
+  checkResults              CheckResult[]
+  members                   TaskMember[]
+  blockers                  TaskBlocker[]
+  comments                  TaskComment[]
+  activities                TaskActivity[]
+  labelAssignments          TaskLabelAssignment[]
+  documentLinks             TaskDocumentLink[]
+  attachments               TaskAttachment[]
+  reminders                 TaskReminder[]
+  workflowLinks             TaskWorkflowLink[]
+  customFieldValues         TaskFieldValue[]
+  workflowInteractions      WorkflowInteraction[]
+
+  @@unique([projectId, taskNumber])
+  @@unique([projectId, taskBranch])
+  @@index([teamId, status])
+  @@index([assigneeUserId, status, queuePosition])
+  @@index([workflowInstanceId, createdAt])
+  @@index([milestoneId, status, priority])
+  @@index([parentTaskId])
+  @@index([spaceId, statusCategory, dueAt])
+  @@index([spaceId, visibility, updatedAt])
+  @@index([createdById, createdAt])
+  @@index([linuxWorkerPoolId, linuxWorkerInstanceId])
+}
+
+model ProjectTaskFieldDefinition {
+  id          String           @id @db.VarChar(96)
+  projectId   String           @db.VarChar(64)
+  key         String           @db.VarChar(64)
+  name        String           @db.VarChar(191)
+  type        String           @db.VarChar(16)
+  required    Boolean          @default(false)
+  options     Json?
+  sortOrder   Int              @default(0)
+  isActive    Boolean          @default(true)
+  createdById String           @db.VarChar(64)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  project     Project          @relation(fields: [projectId], references: [id])
+  createdBy   User             @relation("ProjectTaskFieldDefinitionCreatedBy", fields: [createdById], references: [id])
+  values      TaskFieldValue[]
+
+  @@unique([projectId, key])
+  @@index([projectId, sortOrder])
+}
+
+model TaskFieldValue {
+  id                String                     @id @db.VarChar(96)
+  taskId            String                     @db.VarChar(96)
+  fieldDefinitionId String                     @db.VarChar(96)
+  textValue         String?                    @db.LongText
+  numberValue       Float?
+  dateValue         DateTime?
+  booleanValue      Boolean?
+  userValue         String?                    @db.VarChar(64)
+  selectValue       String?                    @db.VarChar(191)
+  createdAt         DateTime                   @default(now())
+  updatedAt         DateTime                   @updatedAt
+  task              Task                       @relation(fields: [taskId], references: [id])
+  fieldDefinition   ProjectTaskFieldDefinition @relation(fields: [fieldDefinitionId], references: [id])
+
+  @@unique([taskId, fieldDefinitionId])
+  @@index([fieldDefinitionId, updatedAt])
+}
+
+model TaskMember {
+  id        String   @id @db.VarChar(96)
+  taskId    String   @db.VarChar(96)
+  userId    String   @db.VarChar(64)
+  role      String   @db.VarChar(16)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  task      Task     @relation(fields: [taskId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@unique([taskId, userId])
+  @@index([userId, role])
+}
+
+model TaskStatusDefinition {
+  id          String   @id @db.VarChar(96)
+  spaceId     String   @db.VarChar(96)
+  projectId   String?  @db.VarChar(64)
+  scopeKey    String   @db.VarChar(191)
+  key         String   @db.VarChar(64)
+  name        String   @db.VarChar(191)
+  category    String   @db.VarChar(32)
+  color       String   @db.VarChar(32)
+  sortOrder   Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdById String?  @db.VarChar(64)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  space       Space    @relation(fields: [spaceId], references: [id])
+  project     Project? @relation(fields: [projectId], references: [id])
+  createdBy   User?    @relation("TaskStatusDefinitionCreatedBy", fields: [createdById], references: [id])
+  tasks       Task[]
+
+  @@unique([spaceId, scopeKey, key])
+  @@index([spaceId, projectId, sortOrder])
+}
+
+model TaskSavedView {
+  id        String   @id @db.VarChar(96)
+  userId    String   @db.VarChar(64)
+  spaceId   String?  @db.VarChar(96)
+  name      String   @db.VarChar(191)
+  viewMode  String   @db.VarChar(16)
+  filters   Json
+  grouping  String?  @db.VarChar(32)
+  sorting   String?  @db.VarChar(32)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id])
+  space     Space?   @relation(fields: [spaceId], references: [id])
+
+  @@unique([userId, name])
+  @@index([userId, spaceId, updatedAt])
+}
+
+model TaskBlocker {
+  id           String    @id @db.VarChar(96)
+  taskId       String    @db.VarChar(96)
+  reason       String    @db.Text
+  status       String    @db.VarChar(16)
+  ownerUserId  String?   @db.VarChar(64)
+  createdById  String    @db.VarChar(64)
+  resolvedById String?   @db.VarChar(64)
+  resolvedAt   DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  task         Task      @relation(fields: [taskId], references: [id])
+  ownerUser    User?     @relation("TaskBlockerOwner", fields: [ownerUserId], references: [id])
+  createdBy    User      @relation("TaskBlockerCreatedBy", fields: [createdById], references: [id])
+  resolvedBy   User?     @relation("TaskBlockerResolvedBy", fields: [resolvedById], references: [id])
+
+  @@index([taskId, status, createdAt])
+  @@index([ownerUserId, status])
+}
+
+model TaskComment {
+  id              String    @id @db.VarChar(96)
+  taskId          String    @db.VarChar(96)
+  authorUserId    String    @db.VarChar(64)
+  contentMarkdown String    @db.Text
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  deletedAt       DateTime?
+  task            Task      @relation(fields: [taskId], references: [id])
+  author          User      @relation(fields: [authorUserId], references: [id])
+
+  @@index([taskId, createdAt])
+}
+
+model TaskActivity {
+  id            String   @id @db.VarChar(128)
+  taskId        String   @db.VarChar(96)
+  type          String   @db.VarChar(64)
+  actorType     String   @db.VarChar(16)
+  actorUserId   String?  @db.VarChar(64)
+  message       String?  @db.Text
+  payload       Json?
+  correlationId String?  @db.VarChar(128)
+  createdAt     DateTime @default(now())
+  task          Task     @relation(fields: [taskId], references: [id])
+  actor         User?    @relation(fields: [actorUserId], references: [id])
+
+  @@index([taskId, createdAt])
+  @@index([actorUserId, createdAt])
+}
+
+model TaskLabel {
+  id          String                @id @db.VarChar(96)
+  spaceId     String                @db.VarChar(96)
+  name        String                @db.VarChar(64)
+  color       String                @db.VarChar(32)
+  createdById String                @db.VarChar(64)
+  createdAt   DateTime              @default(now())
+  updatedAt   DateTime              @updatedAt
+  space       Space                 @relation(fields: [spaceId], references: [id])
+  createdBy   User                  @relation("TaskLabelCreatedBy", fields: [createdById], references: [id])
+  assignments TaskLabelAssignment[]
+
+  @@unique([spaceId, name])
+  @@index([spaceId, updatedAt])
+}
+
+model TaskLabelAssignment {
+  id           String    @id @db.VarChar(96)
+  taskId       String    @db.VarChar(96)
+  labelId      String    @db.VarChar(96)
+  assignedById String    @db.VarChar(64)
+  createdAt    DateTime  @default(now())
+  task         Task      @relation(fields: [taskId], references: [id])
+  label        TaskLabel @relation(fields: [labelId], references: [id])
+  assignedBy   User      @relation(fields: [assignedById], references: [id])
+
+  @@unique([taskId, labelId])
+  @@index([labelId, createdAt])
+}
+
+model TaskDocumentLink {
+  id         String   @id @db.VarChar(96)
+  taskId     String   @db.VarChar(96)
+  documentId String   @db.VarChar(96)
+  linkedById String   @db.VarChar(64)
+  createdAt  DateTime @default(now())
+  task       Task     @relation(fields: [taskId], references: [id])
+  document   Document @relation(fields: [documentId], references: [id])
+  linkedBy   User     @relation(fields: [linkedById], references: [id])
+
+  @@unique([taskId, documentId])
+  @@index([documentId, createdAt])
+}
+
+model TaskAttachment {
+  id           String    @id @db.VarChar(96)
+  taskId       String    @db.VarChar(96)
+  storageKey   String    @unique @db.VarChar(512)
+  originalName String    @db.VarChar(191)
+  mimeType     String    @db.VarChar(191)
+  byteSize     BigInt
+  uploadedById String    @db.VarChar(64)
+  deletedAt    DateTime?
+  createdAt    DateTime  @default(now())
+  task         Task      @relation(fields: [taskId], references: [id])
+  uploadedBy   User      @relation(fields: [uploadedById], references: [id])
+
+  @@index([taskId, deletedAt, createdAt])
+}
+
+model TaskReminder {
+  id              String    @id @db.VarChar(96)
+  taskId          String    @db.VarChar(96)
+  recipientUserId String    @db.VarChar(64)
+  remindAt        DateTime
+  channel         String    @db.VarChar(32)
+  status          String    @db.VarChar(16)
+  idempotencyKey  String    @unique @db.VarChar(191)
+  sentAt          DateTime?
+  lastError       String?   @db.Text
+  createdById     String    @db.VarChar(64)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  task            Task      @relation(fields: [taskId], references: [id])
+  recipient       User      @relation("TaskReminderRecipient", fields: [recipientUserId], references: [id])
+  createdBy       User      @relation("TaskReminderCreatedBy", fields: [createdById], references: [id])
+
+  @@index([status, remindAt])
+  @@index([taskId, remindAt])
+}
+
+model TaskWorkflowLink {
+  id                 String           @id @db.VarChar(96)
+  taskId             String           @db.VarChar(96)
+  workflowInstanceId String           @db.VarChar(64)
+  stepTemplateId     String?          @db.VarChar(64)
+  statusMapping      Json?
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+  task               Task             @relation(fields: [taskId], references: [id])
+  workflowInstance   WorkflowInstance @relation(fields: [workflowInstanceId], references: [id])
+
+  @@unique([taskId, workflowInstanceId])
+  @@index([workflowInstanceId, createdAt])
+}
+
+model ProjectStage {
+  id                String      @id @db.VarChar(96)
+  projectId         String      @db.VarChar(64)
+  key               String      @db.VarChar(128)
+  name              String      @db.VarChar(191)
+  description       String?     @db.Text
+  status            String      @db.VarChar(32)
+  sortOrder         Int
+  entryCriteria     Json
+  exitCriteria      Json
+  startedAt         DateTime?
+  startAt           DateTime?
+  targetAt          DateTime?
+  completedAt       DateTime?
+  publishedAt       DateTime?
+  publicationStatus String      @default("unreleased") @db.VarChar(16)
+  version           Int         @default(1)
+  project           Project     @relation(fields: [projectId], references: [id])
+  milestones        Milestone[]
+
+  @@unique([projectId, key])
+  @@index([projectId, sortOrder])
+}
+
+model Milestone {
+  id                  String            @id @db.VarChar(96)
+  projectId           String            @db.VarChar(64)
+  stageId             String            @db.VarChar(96)
+  name                String            @db.VarChar(191)
+  description         String?           @db.Text
+  status              String            @db.VarChar(32)
+  sortOrder           Int               @default(0)
+  ownerUserId         String?           @db.VarChar(64)
+  targetAt            DateTime?
+  requiredCheckPolicy Json
+  riskSummary         String?           @db.Text
+  version             Int               @default(1)
+  project             Project           @relation(fields: [projectId], references: [id])
+  stage               ProjectStage      @relation(fields: [stageId], references: [id])
+  tasks               Task[]
+  checkDefinitions    CheckDefinition[]
+
+  @@index([projectId, status])
+  @@index([stageId, sortOrder])
+}
+
+model TaskDependency {
+  id                String   @id @db.VarChar(128)
+  projectId         String   @db.VarChar(64)
+  predecessorTaskId String   @db.VarChar(96)
+  successorTaskId   String   @db.VarChar(96)
+  type              String   @db.VarChar(16)
+  createdByActor    String   @db.VarChar(191)
+  createdAt         DateTime @default(now())
+  project           Project  @relation(fields: [projectId], references: [id])
+  predecessorTask   Task     @relation("TaskDependencyPredecessor", fields: [predecessorTaskId], references: [id])
+  successorTask     Task     @relation("TaskDependencySuccessor", fields: [successorTaskId], references: [id])
+
+  @@unique([predecessorTaskId, successorTaskId, type])
+  @@index([projectId, successorTaskId])
+}
+
+model CheckDefinition {
+  id             String        @id @db.VarChar(128)
+  projectId      String        @db.VarChar(64)
+  taskId         String?       @db.VarChar(96)
+  milestoneId    String?       @db.VarChar(96)
+  type           String        @db.VarChar(32)
+  name           String        @db.VarChar(191)
+  required       Boolean
+  configuration  Json
+  timeoutSeconds Int?
+  project        Project       @relation(fields: [projectId], references: [id])
+  task           Task?         @relation(fields: [taskId], references: [id])
+  milestone      Milestone?    @relation(fields: [milestoneId], references: [id])
+  results        CheckResult[]
+
+  @@index([projectId, taskId, milestoneId])
+}
+
+model WorkflowDefinitionVersion {
+  id            String   @id @db.VarChar(128)
+  projectId     String   @db.VarChar(64)
+  definitionKey String   @db.VarChar(128)
+  version       Int
+  status        String   @db.VarChar(32)
+  definition    Json
+  createdAt     DateTime @default(now())
+  project       Project  @relation(fields: [projectId], references: [id])
+
+  @@unique([projectId, definitionKey, version])
+  @@index([projectId, status])
+}
+
+model TaskEvent {
+  id                 String           @id @db.VarChar(128)
+  taskId             String           @db.VarChar(96)
+  workflowInstanceId String           @db.VarChar(64)
+  type               String           @db.VarChar(64)
+  fromStatus         String?          @db.VarChar(32)
+  toStatus           String?          @db.VarChar(32)
+  actorType          String           @db.VarChar(16)
+  actorUserId        String?          @db.VarChar(64)
+  message            String?          @db.Text
+  payload            Json?
+  createdAt          DateTime         @default(now())
+  task               Task             @relation(fields: [taskId], references: [id])
+  workflowInstance   WorkflowInstance @relation(fields: [workflowInstanceId], references: [id])
+
+  @@index([taskId, createdAt])
+  @@index([workflowInstanceId, createdAt])
+}
+
+model CommandReceipt {
+  id            String    @id @db.VarChar(128)
+  aggregateType String    @db.VarChar(32)
+  aggregateId   String    @db.VarChar(96)
+  status        String    @db.VarChar(32)
+  result        Json?
+  errorCode     String?   @db.VarChar(64)
+  createdAt     DateTime  @default(now())
+  completedAt   DateTime?
+
+  @@index([aggregateType, aggregateId, createdAt])
+}
+
+model OrchestrationEvent {
+  id               String   @id @db.VarChar(128)
+  eventType        String   @db.VarChar(96)
+  aggregateType    String   @db.VarChar(32)
+  aggregateId      String   @db.VarChar(96)
+  aggregateVersion Int
+  sequence         Int
+  correlationId    String   @db.VarChar(128)
+  causationId      String?  @db.VarChar(128)
+  commandId        String?  @db.VarChar(128)
+  actorType        String   @db.VarChar(32)
+  actorId          String   @db.VarChar(96)
+  occurredAt       DateTime
+  payload          Json
+  createdAt        DateTime @default(now())
+
+  @@unique([aggregateType, aggregateId, sequence])
+  @@unique([commandId, eventType])
+  @@index([correlationId, occurredAt])
+}
+
+model OrchestrationAggregateSequence {
+  aggregateType String   @db.VarChar(32)
+  aggregateId   String   @db.VarChar(96)
+  sequence      Int
+  updatedAt     DateTime @updatedAt
+
+  @@id([aggregateType, aggregateId])
+}
+
+model OutboxMessage {
+  id             String    @id @db.VarChar(128)
+  topic          String    @db.VarChar(96)
+  aggregateType  String    @db.VarChar(32)
+  aggregateId    String    @db.VarChar(96)
+  payload        Json
+  availableAt    DateTime
+  attempts       Int       @default(0)
+  claimedAt      DateTime?
+  claimToken     String?   @db.VarChar(128)
+  claimExpiresAt DateTime?
+  publishedAt    DateTime?
+  deadLetteredAt DateTime?
+  lastError      String?   @db.Text
+  createdAt      DateTime  @default(now())
+
+  @@index([publishedAt, availableAt])
+  @@index([deadLetteredAt, claimExpiresAt, availableAt])
+}
+
+model LocalDevice {
+  id                 String                      @id @db.VarChar(64)
+  userId             String                      @db.VarChar(64)
+  name               String                      @db.VarChar(191)
+  platform           String                      @db.VarChar(32)
+  deviceTokenHash    String?                     @db.VarChar(64)
+  status             String                      @default("pending") @db.VarChar(32)
+  capabilitySnapshot Json?
+  authorizedAt       DateTime?
+  revokedAt          DateTime?
+  lastSeenAt         DateTime?
+  createdAt          DateTime                    @default(now())
+  updatedAt          DateTime                    @updatedAt
+  user               User                        @relation(fields: [userId], references: [id])
+  toolSessions       ToolSession[]
+  agentWorkers       AgentWorker[]
+  desktopSessions    DesktopSession[]
+  projectWorkspaces  ProjectDeviceWorkspace[]
+  runtimeProfiles    DeviceAgentRuntimeProfile[]
+
+  @@index([userId, platform])
+}
+
+model ProjectDeviceWorkspace {
+  id                   String      @id @db.VarChar(96)
+  projectId            String      @db.VarChar(64)
+  userId               String      @db.VarChar(64)
+  localDeviceId        String      @db.VarChar(64)
+  status               String      @default("ready") @db.VarChar(32)
+  pathFingerprint      String      @db.VarChar(160)
+  configurationVersion Int         @default(1)
+  lastValidatedAt      DateTime?
+  createdAt            DateTime    @default(now())
+  updatedAt            DateTime    @updatedAt
+  project              Project     @relation(fields: [projectId], references: [id])
+  user                 User        @relation(fields: [userId], references: [id])
+  localDevice          LocalDevice @relation(fields: [localDeviceId], references: [id])
+
+  @@unique([projectId, userId, localDeviceId])
+  @@index([projectId, status, updatedAt])
+  @@index([userId, localDeviceId, status])
+}
+
+model DeviceAgentRuntimeProfile {
+  id              String      @id @db.VarChar(96)
+  userId          String      @db.VarChar(64)
+  localDeviceId   String      @db.VarChar(64)
+  provider        String      @db.VarChar(32)
+  label           String      @db.VarChar(191)
+  status          String      @db.VarChar(32)
+  version         Int         @default(1)
+  capabilities    Json
+  modelSites      Json        @default(dbgenerated("(json_array())"))
+  lastValidatedAt DateTime?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  user            User        @relation(fields: [userId], references: [id])
+  localDevice     LocalDevice @relation(fields: [localDeviceId], references: [id])
+
+  @@unique([userId, localDeviceId, provider])
+  @@index([localDeviceId, status, provider])
+  @@index([userId, status, updatedAt])
+}
+
+model DesktopSession {
+  id               String              @id @db.VarChar(96)
+  userId           String              @db.VarChar(64)
+  installationId   String              @db.VarChar(96)
+  deviceId         String              @db.VarChar(64)
+  refreshTokenHash String              @db.VarChar(64)
+  status           String              @default("active") @db.VarChar(32)
+  expiresAt        DateTime
+  lastUsedAt       DateTime
+  revokedAt        DateTime?
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+  version          Int                 @default(1)
+  user             User                @relation(fields: [userId], references: [id])
+  device           LocalDevice         @relation(fields: [deviceId], references: [id])
+  webHandoffs      DesktopWebHandoff[]
+
+  @@index([userId, status, expiresAt])
+  @@index([installationId, status])
+  @@index([deviceId, status])
+}
+
+model WebSession {
+  id              String    @id @db.VarChar(32)
+  userId          String    @db.VarChar(64)
+  tokenHash       String    @unique @db.VarChar(64)
+  deviceName      String    @db.VarChar(191)
+  browserName     String    @db.VarChar(64)
+  operatingSystem String    @db.VarChar(64)
+  userAgent       String    @db.VarChar(512)
+  ipAddress       String?   @db.VarChar(64)
+  status          String    @default("active") @db.VarChar(32)
+  lastSeenAt      DateTime
+  expiresAt       DateTime
+  revokedAt       DateTime?
+  revokedReason   String?   @db.VarChar(64)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  user            User      @relation(fields: [userId], references: [id])
+
+  @@index([userId, status, expiresAt])
+  @@index([expiresAt, revokedAt])
+}
+
+model DesktopWebHandoff {
+  id         String         @id @db.VarChar(96)
+  userId     String         @db.VarChar(64)
+  sessionId  String         @db.VarChar(96)
+  codeHash   String         @unique @db.VarChar(64)
+  targetPath String         @db.VarChar(512)
+  expiresAt  DateTime
+  consumedAt DateTime?
+  createdAt  DateTime       @default(now())
+  user       User           @relation(fields: [userId], references: [id])
+  session    DesktopSession @relation(fields: [sessionId], references: [id])
+
+  @@index([sessionId, consumedAt, expiresAt])
+  @@index([userId, createdAt])
+}
+
+model ToolSession {
+  id                String      @id @db.VarChar(96)
+  taskId            String      @db.VarChar(96)
+  localDeviceId     String      @db.VarChar(64)
+  sessionType       String      @db.VarChar(32)
+  sessionName       String      @db.VarChar(191)
+  status            String      @db.VarChar(32)
+  lastOutputSummary String?     @db.Text
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+  task              Task        @relation(fields: [taskId], references: [id])
+  localDevice       LocalDevice @relation(fields: [localDeviceId], references: [id])
+
+  @@index([taskId, status])
+  @@index([localDeviceId, status])
+}
+
+model AgentProfile {
+  id                     String     @id @db.VarChar(96)
+  spaceId                String     @db.VarChar(96)
+  name                   String     @db.VarChar(191)
+  provider               String     @db.VarChar(32)
+  status                 String     @db.VarChar(32)
+  model                  String?    @db.VarChar(191)
+  capabilities           Json
+  defaultExecutionPolicy Json
+  providerConfig         Json
+  createdById            String     @db.VarChar(64)
+  createdAt              DateTime   @default(now())
+  updatedAt              DateTime   @updatedAt
+  space                  Space      @relation(fields: [spaceId], references: [id])
+  runs                   AgentRun[]
+
+  @@index([spaceId, status, provider])
+}
+
+model AgentWorker {
+  id                String         @id @db.VarChar(96)
+  spaceId           String         @db.VarChar(96)
+  localDeviceId     String?        @db.VarChar(64)
+  name              String         @db.VarChar(191)
+  runtimeType       String         @db.VarChar(32)
+  agentVersion      String?        @db.VarChar(64)
+  status            String         @db.VarChar(32)
+  capabilities      Json
+  maxConcurrentRuns Int
+  activeRunCount    Int            @default(0)
+  credentialHash    String?        @db.VarChar(191)
+  lastHeartbeatAt   DateTime?
+  version           Int            @default(1)
+  space             Space          @relation(fields: [spaceId], references: [id])
+  localDevice       LocalDevice?   @relation(fields: [localDeviceId], references: [id])
+  runs              AgentRun[]
+  sessions          AgentSession[]
+  workspaces        Workspace[]
+
+  @@index([spaceId, status, lastHeartbeatAt])
+}
+
+model WorkerPool {
+  id                      String                      @id @db.Char(32)
+  ownerType               String                      @default("personal") @db.VarChar(32)
+  ownerUserId             String?                     @db.VarChar(64)
+  companyId               String?                     @db.VarChar(64)
+  displayName             String                      @db.VarChar(191)
+  status                  String                      @db.VarChar(32)
+  maxConcurrentRuns       Int
+  configuration           Json
+  bootstrapTokenHash      String                      @db.Char(64)
+  bootstrapTokenEncrypted String                      @db.Text
+  tokenVersion            Int                         @default(1)
+  lastSeenAt              DateTime?
+  revokedAt               DateTime?
+  createdAt               DateTime                    @default(now())
+  updatedAt               DateTime                    @updatedAt
+  ownerUser               User?                       @relation("WorkerPoolOwner", fields: [ownerUserId], references: [id])
+  company                 Company?                    @relation(fields: [companyId], references: [id])
+  sessions                WorkerPoolSession[]
+  audits                  WorkerPoolAudit[]
+  loopBindings            ProjectLoopBinding[]        @relation("ProjectLoopBindingWorkerPool")
+  projects                Project[]                   @relation("ProjectWorkerPool")
+  validationChallenges    WorkerValidationChallenge[]
+
+  @@unique([ownerUserId, displayName])
+  @@unique([companyId, displayName])
+  @@index([ownerUserId, status, updatedAt])
+  @@index([companyId, status, updatedAt])
+  @@index([status, lastSeenAt])
+}
+
+/// Registry source. Platform sources are global; company sources are visible only to that company.
+model WorkerImageSource {
+  id              String               @id @db.Char(32)
+  ownerType       String               @default("platform") @db.VarChar(32)
+  companyId       String?              @db.VarChar(64)
+  name            String               @db.VarChar(191)
+  repository      String               @db.VarChar(767)
+  status          String               @db.VarChar(32)
+  createdByUserId String?              @db.VarChar(64)
+  createdAt       DateTime             @default(now())
+  updatedAt       DateTime             @updatedAt
+  company         Company?             @relation(fields: [companyId], references: [id], map: "WIS_company_fkey")
+  createdByUser   User?                @relation("WorkerImageSourceCreator", fields: [createdByUserId], references: [id])
+  versions        WorkerImageVersion[]
+
+  @@index([status, updatedAt])
+  @@index([ownerType, companyId, status, updatedAt], map: "WIS_scope_status_updated_idx")
+}
+
+/// Immutable Worker image digest published under a catalog source.
+model WorkerImageVersion {
+  id          String            @id @db.Char(32)
+  sourceId    String            @db.Char(32)
+  tag         String            @db.VarChar(191)
+  digest      String            @unique @db.Char(71)
+  status      String            @db.VarChar(32)
+  publishedAt DateTime?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  source      WorkerImageSource @relation(fields: [sourceId], references: [id])
+  projects    Project[]         @relation("ProjectWorkerImageVersion")
+
+  @@unique([sourceId, tag])
+  @@index([sourceId, status, publishedAt])
+}
+
+model WorkerModelSite {
+  id              String   @id @db.Char(32)
+  ownerType       String   @default("personal") @db.VarChar(32)
+  ownerUserId     String?  @db.VarChar(64)
+  companyId       String?  @db.VarChar(64)
+  name            String   @db.VarChar(191)
+  provider        String   @db.VarChar(32)
+  endpoint        String   @db.VarChar(1024)
+  models          Json     @default(dbgenerated("(json_array())"))
+  apiKeyEncrypted String   @db.Text
+  status          String   @db.VarChar(32)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  ownerUser       User?    @relation("WorkerModelSiteOwner", fields: [ownerUserId], references: [id])
+  company         Company? @relation(fields: [companyId], references: [id])
+
+  @@unique([ownerUserId, name])
+  @@unique([companyId, name])
+  @@index([ownerUserId, status, updatedAt])
+  @@index([companyId, status, updatedAt])
+}
+
+model WorkerPoolSession {
+  id                   String                      @id @db.Char(32)
+  workerPoolId         String                      @db.Char(32)
+  instanceId           String                      @db.VarChar(191)
+  runtime              String                      @default("docker") @db.VarChar(32)
+  taskGroupName        String?                     @db.VarChar(191)
+  tokenHash            String                      @db.Char(64)
+  status               String                      @db.VarChar(32)
+  capabilities         Json
+  requestedConcurrency Int
+  expiresAt            DateTime
+  lastSeenAt           DateTime?
+  revokedAt            DateTime?
+  createdAt            DateTime                    @default(now())
+  updatedAt            DateTime                    @updatedAt
+  workerPool           WorkerPool                  @relation(fields: [workerPoolId], references: [id])
+  linuxRuns            AgentRun[]                  @relation("LinuxWorkerPoolSessionRuns")
+  validationChallenges WorkerValidationChallenge[]
+
+  @@unique([workerPoolId, instanceId])
+  @@index([workerPoolId, status, expiresAt])
+  @@index([tokenHash, status, expiresAt])
+}
+
+/// A non-business Worker probe. It deliberately has no Task, LoopRun or AgentRun reference.
+model WorkerValidationChallenge {
+  id                              String            @id @db.Char(32)
+  projectId                       String            @db.VarChar(64)
+  workerPoolId                    String            @db.Char(32)
+  workerPoolSessionId             String            @db.Char(32)
+  environmentConfigurationVersion Int
+  status                          String            @db.VarChar(32)
+  claimedAt                       DateTime?
+  acknowledgedAt                  DateTime?
+  expiresAt                       DateTime
+  createdAt                       DateTime          @default(now())
+  updatedAt                       DateTime          @updatedAt
+  project                         Project           @relation(fields: [projectId], references: [id])
+  workerPool                      WorkerPool        @relation(fields: [workerPoolId], references: [id])
+  workerPoolSession               WorkerPoolSession @relation(fields: [workerPoolSessionId], references: [id])
+
+  @@index([projectId, workerPoolId, status, expiresAt], map: "WVC_project_pool_status_expires_idx")
+  @@index([workerPoolId, workerPoolSessionId, status, expiresAt], map: "WVC_pool_session_status_expires_idx")
+}
+
+model WorkerPoolAudit {
+  id           String     @id @db.Char(32)
+  workerPoolId String     @db.Char(32)
+  actorUserId  String     @db.VarChar(64)
+  action       String     @db.VarChar(64)
+  metadata     Json
+  createdAt    DateTime   @default(now())
+  workerPool   WorkerPool @relation(fields: [workerPoolId], references: [id])
+  actorUser    User       @relation("WorkerPoolAuditActor", fields: [actorUserId], references: [id])
+
+  @@index([workerPoolId, createdAt])
+  @@index([actorUserId, createdAt])
+}
+
+model AgentRun {
+  id                       String             @id @db.VarChar(96)
+  projectId                String?            @db.VarChar(64)
+  /// Legacy attempt identity. Graph attempts must leave taskId null and resolve Task context through LoopRun.
+  taskId                   String?            @db.VarChar(96)
+  loopRunId                String?            @db.VarChar(96)
+  /// Graph attempt identity. Legacy attempts must leave loopNodeRunId null.
+  loopNodeRunId            String?            @db.VarChar(96)
+  loopIterationId          String?            @db.VarChar(96)
+  attempt                  Int
+  agentProfileId           String             @db.VarChar(96)
+  workerId                 String?            @db.VarChar(96)
+  linuxWorkerPoolSessionId String?            @db.Char(32)
+  workspaceId              String?            @unique @db.VarChar(96)
+  status                   String             @db.VarChar(32)
+  leaseGeneration          Int                @default(0)
+  leaseExpiresAt           DateTime?
+  lastHeartbeatAt          DateTime?
+  inputSnapshot            Json
+  structuredResult         Json?
+  providerSessionId        String?            @db.VarChar(191)
+  usage                    Json?
+  exitReason               String?            @db.Text
+  checkpoint               Json?
+  lastEventSequence        Int                @default(0)
+  version                  Int                @default(1)
+  startedAt                DateTime?
+  finishedAt               DateTime?
+  createdAt                DateTime           @default(now())
+  project                  Project?           @relation(fields: [projectId], references: [id])
+  task                     Task?              @relation(fields: [taskId], references: [id])
+  loopRun                  LoopRun?           @relation(fields: [loopRunId], references: [id])
+  loopNodeRun              LoopNodeRun?       @relation("AgentRunLoopNodeRun", fields: [loopNodeRunId], references: [id])
+  loopNodeAttempt          LoopNodeAttempt?   @relation("LoopNodeAttemptAgentRun")
+  agentProfile             AgentProfile       @relation(fields: [agentProfileId], references: [id])
+  worker                   AgentWorker?       @relation(fields: [workerId], references: [id])
+  linuxWorkerPoolSession   WorkerPoolSession? @relation("LinuxWorkerPoolSessionRuns", fields: [linuxWorkerPoolSessionId], references: [id])
+  workspace                Workspace?         @relation("AgentRunWorkspace")
+  sessions                 AgentSession[]
+  approvalRequests         ApprovalRequest[]
+  artifacts                Artifact[]
+  checkResults             CheckResult[]
+
+  @@unique([taskId, attempt])
+  @@unique([loopNodeRunId, attempt])
+  @@index([createdAt, id])
+  @@index([projectId, status, createdAt])
+  @@index([status, createdAt])
+  @@index([workerId, status, leaseExpiresAt])
+  @@index([linuxWorkerPoolSessionId, status, leaseExpiresAt])
+}
+
+model AgentSession {
+  id                String      @id @db.VarChar(96)
+  agentRunId        String      @db.VarChar(96)
+  workerId          String      @db.VarChar(96)
+  provider          String      @db.VarChar(32)
+  providerSessionId String?     @db.VarChar(191)
+  sessionType       String      @db.VarChar(32)
+  sessionName       String?     @db.VarChar(191)
+  status            String      @db.VarChar(32)
+  resumeMetadata    Json?
+  lastOutputSummary String?     @db.Text
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+  agentRun          AgentRun    @relation(fields: [agentRunId], references: [id])
+  worker            AgentWorker @relation(fields: [workerId], references: [id])
+
+  @@index([agentRunId, status])
+  @@index([workerId, status])
+}
+
+model Workspace {
+  id               String      @id @db.VarChar(96)
+  projectId        String      @db.VarChar(64)
+  agentRunId       String      @unique @db.VarChar(96)
+  workerId         String      @db.VarChar(96)
+  strategy         String      @db.VarChar(32)
+  path             String      @db.VarChar(1024)
+  branchName       String?     @db.VarChar(191)
+  baseCommit       String?     @db.VarChar(64)
+  headCommit       String?     @db.VarChar(64)
+  resourceKeys     Json
+  allowedPathScope Json
+  status           String      @db.VarChar(32)
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+  project          Project     @relation(fields: [projectId], references: [id])
+  agentRun         AgentRun    @relation("AgentRunWorkspace", fields: [agentRunId], references: [id])
+  worker           AgentWorker @relation(fields: [workerId], references: [id])
+
+  @@index([projectId, status])
+  @@index([workerId, status])
+}
+
+model LoopDefinition {
+  id                       String               @id @db.VarChar(96)
+  spaceId                  String               @db.VarChar(96)
+  name                     String               @db.VarChar(191)
+  description              String?              @db.Text
+  ownerUserId              String               @db.VarChar(64)
+  draftGraph               Json
+  draftRevision            Int                  @default(1)
+  status                   String               @db.VarChar(32)
+  scope                    String               @default("task") @db.VarChar(16)
+  origin                   String               @default("space") @db.VarChar(16)
+  latestPublishedVersionId String?              @unique @db.VarChar(96)
+  createdAt                DateTime             @default(now())
+  updatedAt                DateTime             @updatedAt
+  space                    Space                @relation(fields: [spaceId], references: [id])
+  ownerUser                User                 @relation("LoopDefinitionOwner", fields: [ownerUserId], references: [id])
+  latestPublishedVersion   LoopVersion?         @relation("LoopDefinitionLatestPublishedVersion", fields: [latestPublishedVersionId], references: [id])
+  versions                 LoopVersion[]        @relation("LoopDefinitionVersions")
+  bindings                 ProjectLoopBinding[]
+
+  @@index([spaceId, status, updatedAt])
+  @@index([ownerUserId, status])
+}
+
+model LoopVersion {
+  id                     String               @id @db.VarChar(96)
+  loopDefinitionId       String               @db.VarChar(96)
+  versionNumber          Int
+  graphSchemaVersion     Int
+  graph                  Json
+  maxStages              Int
+  maxRepeatCount         Int
+  platformMaxTransitions Int
+  checksum               String               @db.VarChar(128)
+  publishedByUserId      String               @db.VarChar(64)
+  publishedAt            DateTime
+  status                 String               @db.VarChar(32)
+  loopDefinition         LoopDefinition       @relation("LoopDefinitionVersions", fields: [loopDefinitionId], references: [id])
+  latestForDefinition    LoopDefinition?      @relation("LoopDefinitionLatestPublishedVersion")
+  publishedByUser        User                 @relation("LoopVersionPublisher", fields: [publishedByUserId], references: [id])
+  activeBindings         ProjectLoopBinding[] @relation("ProjectLoopBindingActiveVersion")
+  loopRuns               LoopRun[]
+
+  @@unique([loopDefinitionId, versionNumber])
+  @@index([loopDefinitionId, status, publishedAt])
+}
+
+model ProjectLoopBinding {
+  id                        String            @id @db.VarChar(96)
+  projectId                 String            @db.VarChar(64)
+  loopDefinitionId          String            @db.VarChar(96)
+  activeVersionId           String            @db.VarChar(96)
+  status                    String            @db.VarChar(32)
+  triggerPolicy             Json
+  parameterOverrides        Json
+  notificationPolicy        Json
+  automationGrantIds        Json
+  allowedAgentProfileIds    Json?
+  allowedProviders          Json?
+  workerPoolId              String?           @db.Char(32)
+  workerRepositoryUrl       String?           @db.VarChar(1024)
+  workerBranchPolicy        Json?
+  workerStageConfigurations Json?
+  bindingRole               String?           @db.VarChar(32)
+  version                   Int               @default(1)
+  createdByUserId           String            @db.VarChar(64)
+  createdAt                 DateTime          @default(now())
+  updatedAt                 DateTime          @updatedAt
+  project                   Project           @relation(fields: [projectId], references: [id])
+  loopDefinition            LoopDefinition    @relation(fields: [loopDefinitionId], references: [id])
+  activeVersion             LoopVersion       @relation("ProjectLoopBindingActiveVersion", fields: [activeVersionId], references: [id])
+  createdByUser             User              @relation("ProjectLoopBindingCreator", fields: [createdByUserId], references: [id])
+  workerPool                WorkerPool?       @relation("ProjectLoopBindingWorkerPool", fields: [workerPoolId], references: [id])
+  triggerReceipts           TriggerReceipt[]
+  loopRuns                  LoopRun[]
+  automationGrants          AutomationGrant[]
+
+  @@unique([projectId, bindingRole])
+  @@index([projectId, status, createdAt])
+  @@index([loopDefinitionId, status])
+  @@index([activeVersionId, status])
+  @@index([workerPoolId, status])
+}
+
+model TriggerReceipt {
+  id            String             @id @db.VarChar(128)
+  bindingId     String             @db.VarChar(96)
+  triggerType   String             @db.VarChar(32)
+  sourceEventId String             @db.VarChar(128)
+  commandId     String?            @db.VarChar(128)
+  inputSnapshot Json
+  createdAt     DateTime           @default(now())
+  binding       ProjectLoopBinding @relation(fields: [bindingId], references: [id])
+  loopRun       LoopRun?
+
+  @@unique([bindingId, triggerType, sourceEventId])
+  @@index([createdAt])
+}
+
+model LoopRun {
+  id                       String                    @id @db.VarChar(96)
+  projectId                String?                   @db.VarChar(64)
+  taskId                   String?                   @db.VarChar(96)
+  engineKind               String?                   @default("legacy_bounded") @db.VarChar(32)
+  loopVersionId            String?                   @db.VarChar(96)
+  bindingId                String?                   @db.VarChar(96)
+  triggerReceiptId         String?                   @unique @db.VarChar(128)
+  runGraphSnapshot         Json?
+  graphDigest              String?                   @db.VarChar(80)
+  snapshotVersion          Int?
+  parentLoopRunId          String?                   @db.VarChar(96)
+  parentNodeRunId          String?                   @db.VarChar(96)
+  parentAttemptId          String?                   @db.VarChar(128)
+  inputSnapshot            Json?
+  bindingSnapshot          Json?
+  executionSnapshot        Json?
+  policySnapshot           Json
+  grantSnapshot            Json?
+  budgetSnapshot           Json
+  usageAggregate           Json
+  status                   String                    @db.VarChar(32)
+  statusReason             String?                   @db.Text
+  repeatCount              Int                       @default(0)
+  transitionCount          Int                       @default(0)
+  projectionVersion        Int                       @default(1)
+  currentIteration         Int                       @default(0)
+  stopReason               String?                   @db.Text
+  version                  Int                       @default(1)
+  startedAt                DateTime?
+  finishedAt               DateTime?
+  createdAt                DateTime                  @default(now())
+  project                  Project?                  @relation(fields: [projectId], references: [id])
+  task                     Task?                     @relation(fields: [taskId], references: [id])
+  loopVersion              LoopVersion?              @relation(fields: [loopVersionId], references: [id])
+  binding                  ProjectLoopBinding?       @relation(fields: [bindingId], references: [id])
+  triggerReceipt           TriggerReceipt?           @relation(fields: [triggerReceiptId], references: [id])
+  parentLoopRun            LoopRun?                  @relation("LoopRunChildren", fields: [parentLoopRunId], references: [id])
+  childLoopRuns            LoopRun[]                 @relation("LoopRunChildren")
+  iterations               LoopIteration[]
+  approvals                ApprovalRequest[]
+  agentRuns                AgentRun[]
+  nodeRuns                 LoopNodeRun[]
+  effects                  EffectExecution[]
+  notificationIntents      NotificationIntent[]
+  knowledgeCandidates      KnowledgeCandidate[]
+  milestoneReleaseSnapshot MilestoneReleaseSnapshot?
+  workflowInteractions     WorkflowInteraction[]
+  scheduledTaskRunId       String?                   @unique @db.Char(32)
+  scheduledTaskRun         ProjectScheduledTaskRun?  @relation("ProjectScheduledTaskRunLoopRun", fields: [scheduledTaskRunId], references: [id], onDelete: Restrict)
+
+  @@unique([parentNodeRunId])
+  @@index([projectId, status, createdAt])
+  @@index([taskId, status])
+  @@index([loopVersionId, status])
+  @@index([graphDigest, status])
+  @@index([bindingId, status])
+  @@index([parentLoopRunId, status])
+}
+
+model ProjectScheduledTask {
+  id                      String                      @id @db.Char(32)
+  projectDigest           String                      @db.Char(32)
+  name                    String                      @db.VarChar(191)
+  description             String                      @db.Text
+  status                  String                      @db.VarChar(16)
+  cronExpression          String                      @db.VarChar(191)
+  timezone                String                      @default("Asia/Shanghai") @db.VarChar(64)
+  contentMode             String                      @db.VarChar(24)
+  contentMarkdown         String?                     @db.LongText
+  loopBindingDigest       String                      @db.Char(32)
+  executionTargetDigest   String                      @db.Char(32)
+  configurationSnapshot   Json
+  executionTargetSnapshot Json
+  lastScheduledFor        DateTime?
+  pendingScheduledFor     DateTime?
+  nextRunAt               DateTime?
+  version                 Int                         @default(1)
+  createdByDigest         String                      @db.Char(32)
+  updatedByDigest         String                      @db.Char(32)
+  createdAt               DateTime                    @default(now())
+  updatedAt               DateTime                    @updatedAt
+  runs                    ProjectScheduledTaskRun[]
+  events                  ProjectScheduledTaskEvent[]
+
+  @@unique([projectDigest, name])
+  @@index([projectDigest, status, updatedAt])
+  @@index([status, nextRunAt])
+}
+
+model ProjectScheduledTaskRun {
+  id                        String               @id @db.Char(32)
+  scheduledTaskId           String               @db.Char(32)
+  triggerKey                String               @unique @db.Char(32)
+  triggerSource             String               @db.VarChar(16)
+  scheduledFor              DateTime?
+  triggeredAt               DateTime
+  status                    String               @db.VarChar(24)
+  taskSnapshot              Json
+  contentSnapshot           String?              @db.LongText
+  executionTargetSnapshot   Json
+  preparationSnapshot       Json?
+  preparationLeaseToken     String?              @db.Char(32)
+  preparationLeaseExpiresAt DateTime?
+  loopRunReference          Json?
+  failureCode               String?              @db.VarChar(64)
+  failureMessage            String?              @db.Text
+  startedAt                 DateTime?
+  finishedAt                DateTime?
+  version                   Int                  @default(1)
+  createdAt                 DateTime             @default(now())
+  updatedAt                 DateTime             @updatedAt
+  scheduledTask             ProjectScheduledTask @relation(fields: [scheduledTaskId], references: [id])
+  loopRun                   LoopRun?             @relation("ProjectScheduledTaskRunLoopRun")
+
+  @@index([scheduledTaskId, triggeredAt])
+  @@index([status, triggeredAt])
+  @@index([status, preparationLeaseExpiresAt, triggeredAt])
+}
+
+model ProjectScheduledTaskEvent {
+  id              String               @id @db.Char(32)
+  scheduledTaskId String               @db.Char(32)
+  eventType       String               @db.VarChar(48)
+  actorDigest     String               @db.Char(32)
+  payload         Json
+  occurredAt      DateTime
+  scheduledTask   ProjectScheduledTask @relation(fields: [scheduledTaskId], references: [id])
+
+  @@index([scheduledTaskId, occurredAt])
+}
+
+model LoopNodeRun {
+  id                      String                @id @db.VarChar(96)
+  loopRunId               String                @db.VarChar(96)
+  nodeKey                 String                @db.VarChar(96)
+  activationNo            Int
+  status                  String                @db.VarChar(32)
+  selectedExecutionTarget String?               @db.VarChar(32)
+  waitingReason           String?               @db.VarChar(96)
+  readinessEvidence       Json?
+  inputSnapshot           Json
+  structuredOutput        Json?
+  gateDecision            Json?
+  selectedEdgeId          String?               @db.VarChar(96)
+  attemptCount            Int                   @default(0)
+  version                 Int                   @default(1)
+  readyAt                 DateTime?
+  startedAt               DateTime?
+  finishedAt              DateTime?
+  createdAt               DateTime              @default(now())
+  updatedAt               DateTime              @updatedAt
+  loopRun                 LoopRun               @relation(fields: [loopRunId], references: [id])
+  attempts                LoopNodeAttempt[]
+  agentRuns               AgentRun[]            @relation("AgentRunLoopNodeRun")
+  approvals               ApprovalRequest[]
+  artifacts               Artifact[]
+  effects                 EffectExecution[]
+  notificationIntents     NotificationIntent[]
+  knowledgeCandidates     KnowledgeCandidate[]
+  workflowInteractions    WorkflowInteraction[]
+
+  @@unique([loopRunId, nodeKey, activationNo])
+  @@index([loopRunId, status, createdAt])
+}
+
+model WorkflowInteraction {
+  id              String                          @id @db.VarChar(96)
+  projectId       String                          @db.VarChar(64)
+  taskId          String?                         @db.VarChar(96)
+  loopRunId       String                          @db.VarChar(96)
+  loopNodeRunId   String                          @db.VarChar(96)
+  activationNo    Int
+  kind            String                          @db.VarChar(32)
+  status          String                          @db.VarChar(32)
+  version         Int                             @default(1)
+  messageSequence Int                             @default(0)
+  policySnapshot  Json?
+  createdAt       DateTime                        @default(now())
+  closedAt        DateTime?
+  updatedAt       DateTime                        @updatedAt
+  project         Project                         @relation(fields: [projectId], references: [id])
+  task            Task?                           @relation(fields: [taskId], references: [id])
+  loopRun         LoopRun                         @relation(fields: [loopRunId], references: [id])
+  loopNodeRun     LoopNodeRun                     @relation(fields: [loopNodeRunId], references: [id])
+  messages        WorkflowInteractionMessage[]
+  attachments     WorkflowInteractionAttachment[]
+  mentions        WorkflowInteractionMention[]
+  decision        WorkflowInteractionDecision?
+
+  @@unique([loopNodeRunId, activationNo, kind])
+  @@index([loopRunId, status, createdAt])
+  @@index([projectId, taskId, createdAt])
+}
+
+model WorkflowInteractionMessage {
+  id                String                          @id @db.VarChar(128)
+  interactionId     String                          @db.VarChar(96)
+  sequence          Int
+  actorType         String                          @db.VarChar(16)
+  actorId           String                          @db.VarChar(96)
+  actorUserId       String?                         @db.VarChar(64)
+  commandId         String                          @db.VarChar(128)
+  body              String                          @db.LongText
+  structuredAnswers Json
+  createdAt         DateTime                        @default(now())
+  interaction       WorkflowInteraction             @relation(fields: [interactionId], references: [id])
+  actorUser         User?                           @relation("WorkflowInteractionMessageActor", fields: [actorUserId], references: [id])
+  attachments       WorkflowInteractionAttachment[]
+  mentions          WorkflowInteractionMention[]
+
+  @@unique([interactionId, sequence])
+  @@unique([interactionId, commandId])
+  @@index([actorUserId, createdAt])
+}
+
+model WorkflowInteractionAttachment {
+  id               String                      @id @db.VarChar(128)
+  interactionId    String                      @db.VarChar(96)
+  messageId        String?                     @db.VarChar(128)
+  storageKey       String                      @unique @db.VarChar(512)
+  originalName     String                      @db.VarChar(191)
+  mimeType         String                      @db.VarChar(191)
+  byteSize         Int
+  scanStatus       String                      @default("pending_scan") @db.VarChar(32)
+  checksum         String?                     @db.VarChar(64)
+  scanner          String?                     @db.VarChar(191)
+  uploadedByUserId String?                     @db.VarChar(64)
+  createdAt        DateTime                    @default(now())
+  scannedAt        DateTime?
+  interaction      WorkflowInteraction         @relation(fields: [interactionId], references: [id])
+  message          WorkflowInteractionMessage? @relation(fields: [messageId], references: [id])
+  uploadedBy       User?                       @relation("WorkflowInteractionAttachmentUploader", fields: [uploadedByUserId], references: [id])
+
+  @@index([interactionId, messageId, createdAt])
+  @@index([scanStatus, createdAt])
+}
+
+model WorkflowInteractionMention {
+  id            String                     @id @db.VarChar(128)
+  interactionId String                     @db.VarChar(96)
+  messageId     String                     @db.VarChar(128)
+  userId        String                     @db.VarChar(64)
+  notifiedAt    DateTime?
+  createdAt     DateTime                   @default(now())
+  interaction   WorkflowInteraction        @relation(fields: [interactionId], references: [id])
+  message       WorkflowInteractionMessage @relation(fields: [messageId], references: [id])
+  user          User                       @relation(fields: [userId], references: [id])
+
+  @@unique([messageId, userId])
+  @@index([interactionId, createdAt])
+  @@index([userId, notifiedAt])
+}
+
+model WorkflowInteractionDecision {
+  id             String              @id @db.VarChar(128)
+  interactionId  String              @unique @db.VarChar(96)
+  commandId      String              @unique @db.VarChar(128)
+  decision       String              @db.VarChar(32)
+  actorType      String              @db.VarChar(16)
+  actorId        String              @db.VarChar(96)
+  actorUserId    String?             @db.VarChar(64)
+  reason         String?             @db.Text
+  selectedEdgeId String?             @db.VarChar(96)
+  createdAt      DateTime            @default(now())
+  interaction    WorkflowInteraction @relation(fields: [interactionId], references: [id])
+  actorUser      User?               @relation("WorkflowInteractionDecisionActor", fields: [actorUserId], references: [id])
+
+  @@index([actorUserId, createdAt])
+}
+
+model LoopNodeAttempt {
+  id                String            @id @db.VarChar(128)
+  loopNodeRunId     String            @db.VarChar(96)
+  attempt           Int
+  executorType      String            @db.VarChar(16)
+  status            String            @db.VarChar(32)
+  agentRunId        String?           @unique @db.VarChar(96)
+  inputFingerprint  String            @db.VarChar(128)
+  outputFingerprint String?           @db.VarChar(128)
+  checkpoint        Json?
+  result            Json?
+  error             Json?
+  executionPhase           String?   @db.VarChar(64)
+  executionPhaseStatus     String?   @db.VarChar(24)
+  executionPhaseStartedAt  DateTime?
+  executionPhaseFinishedAt DateTime?
+  executionPhaseCode       String?   @db.VarChar(64)
+  executionPhaseSummary    String?   @db.VarChar(512)
+  executionPhaseUpdatedAt  DateTime?
+  claimToken        String?           @db.VarChar(128)
+  claimExpiresAt    DateTime?
+  version           Int               @default(1)
+  startedAt         DateTime?
+  finishedAt        DateTime?
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  loopNodeRun       LoopNodeRun       @relation(fields: [loopNodeRunId], references: [id])
+  agentRun          AgentRun?         @relation("LoopNodeAttemptAgentRun", fields: [agentRunId], references: [id])
+  effects           EffectExecution[]
+
+  @@unique([loopNodeRunId, attempt])
+  @@index([status, createdAt])
+  @@index([claimExpiresAt, status])
+}
+
+model EffectExecution {
+  id                     String           @id @db.VarChar(128)
+  effectKey              String           @db.VarChar(191)
+  loopRunId              String           @db.VarChar(96)
+  nodeRunId              String           @db.VarChar(96)
+  attemptId              String?          @db.VarChar(128)
+  operationType          String           @db.VarChar(96)
+  requestFingerprint     String           @db.VarChar(128)
+  providerIdempotencyKey String?          @db.VarChar(191)
+  status                 String           @db.VarChar(32)
+  providerReceipt        Json?
+  resultFingerprint      String?          @db.VarChar(128)
+  createdAt              DateTime         @default(now())
+  updatedAt              DateTime         @updatedAt
+  resolvedAt             DateTime?
+  loopRun                LoopRun          @relation(fields: [loopRunId], references: [id])
+  nodeRun                LoopNodeRun      @relation(fields: [nodeRunId], references: [id])
+  attempt                LoopNodeAttempt? @relation(fields: [attemptId], references: [id])
+
+  @@unique([effectKey])
+  @@index([loopRunId, status, createdAt])
+  @@index([nodeRunId, status])
+}
+
+model AutomationGrant {
+  id                      String              @id @db.VarChar(96)
+  spaceId                 String              @db.VarChar(96)
+  projectId               String              @db.VarChar(64)
+  bindingId               String?             @db.VarChar(96)
+  nodeKey                 String?             @db.VarChar(96)
+  status                  String              @db.VarChar(32)
+  scope                   Json
+  policyVersion           String              @db.VarChar(96)
+  confirmationFingerprint String              @db.VarChar(128)
+  createdByUserId         String              @db.VarChar(64)
+  confirmedAt             DateTime
+  expiresAt               DateTime?
+  revokedAt               DateTime?
+  version                 Int                 @default(1)
+  createdAt               DateTime            @default(now())
+  updatedAt               DateTime            @updatedAt
+  space                   Space               @relation(fields: [spaceId], references: [id])
+  project                 Project             @relation(fields: [projectId], references: [id])
+  binding                 ProjectLoopBinding? @relation(fields: [bindingId], references: [id])
+  createdByUser           User                @relation("AutomationGrantCreator", fields: [createdByUserId], references: [id])
+  approvals               ApprovalRequest[]
+
+  @@index([projectId, status, createdAt])
+  @@index([spaceId, status])
+  @@index([bindingId, status])
+}
+
+model NotificationIntent {
+  id              String       @id @db.VarChar(128)
+  projectId       String       @db.VarChar(64)
+  loopRunId       String       @db.VarChar(96)
+  loopNodeRunId   String?      @db.VarChar(96)
+  recipientUserId String       @db.VarChar(64)
+  level           String       @db.VarChar(32)
+  templateKey     String       @db.VarChar(96)
+  templateData    Json
+  dedupeKey       String       @unique @db.VarChar(191)
+  channels        Json
+  status          String       @db.VarChar(32)
+  deliveryState   Json?
+  readAt          DateTime?
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  project         Project      @relation(fields: [projectId], references: [id])
+  loopRun         LoopRun      @relation(fields: [loopRunId], references: [id])
+  loopNodeRun     LoopNodeRun? @relation(fields: [loopNodeRunId], references: [id])
+  recipientUser   User         @relation("NotificationIntentRecipient", fields: [recipientUserId], references: [id])
+
+  @@index([projectId, status, createdAt])
+  @@index([recipientUserId, status, createdAt])
+  @@index([loopRunId, createdAt])
+}
+
+model KnowledgeCandidate {
+  id                       String       @id @db.VarChar(128)
+  projectId                String       @db.VarChar(64)
+  loopRunId                String       @db.VarChar(96)
+  loopNodeRunId            String?      @db.VarChar(96)
+  sourceEventId            String?      @db.VarChar(128)
+  sourceArtifactId         String?      @db.VarChar(96)
+  dedupeKey                String?      @unique @db.VarChar(191)
+  contentSummary           String       @db.Text
+  sourceReferences         Json
+  confidence               Float
+  redactionResult          Json
+  conflictResult           Json
+  extractorVersion         String       @db.VarChar(96)
+  status                   String       @db.VarChar(32)
+  reviewedByUserId         String?      @db.VarChar(64)
+  reviewReason             String?      @db.Text
+  publishedDocumentId      String?      @db.VarChar(96)
+  publishedDocumentVersion Int?
+  reviewedAt               DateTime?
+  publishedAt              DateTime?
+  createdAt                DateTime     @default(now())
+  updatedAt                DateTime     @updatedAt
+  project                  Project      @relation(fields: [projectId], references: [id])
+  loopRun                  LoopRun      @relation(fields: [loopRunId], references: [id])
+  loopNodeRun              LoopNodeRun? @relation(fields: [loopNodeRunId], references: [id])
+  reviewedByUser           User?        @relation("KnowledgeCandidateReviewer", fields: [reviewedByUserId], references: [id])
+
+  @@index([projectId, status, createdAt])
+  @@index([loopRunId, createdAt])
+}
+
+model LoopIteration {
+  id          String    @id @db.VarChar(128)
+  loopRunId   String    @db.VarChar(96)
+  sequence    Int
+  phase       String    @db.VarChar(32)
+  plan        Json?
+  evaluation  Json?
+  decision    Json?
+  startedAt   DateTime
+  completedAt DateTime?
+  loopRun     LoopRun   @relation(fields: [loopRunId], references: [id])
+
+  @@unique([loopRunId, sequence])
+  @@index([loopRunId, phase])
+}
+
+model ApprovalRequest {
+  id                String           @id @db.VarChar(96)
+  projectId         String           @db.VarChar(64)
+  taskId            String?          @db.VarChar(96)
+  loopRunId         String?          @db.VarChar(96)
+  agentRunId        String?          @db.VarChar(96)
+  loopNodeRunId     String?          @db.VarChar(96)
+  automationGrantId String?          @db.VarChar(96)
+  type              String           @db.VarChar(32)
+  status            String           @db.VarChar(32)
+  requestedByActor  String           @db.VarChar(191)
+  requestPayload    Json
+  policySnapshot    Json
+  decidedByUserId   String?          @db.VarChar(64)
+  decisionReason    String?          @db.Text
+  grantPayload      Json?
+  expiresAt         DateTime?
+  createdAt         DateTime         @default(now())
+  decidedAt         DateTime?
+  project           Project          @relation(fields: [projectId], references: [id])
+  task              Task?            @relation(fields: [taskId], references: [id])
+  loopRun           LoopRun?         @relation(fields: [loopRunId], references: [id])
+  agentRun          AgentRun?        @relation(fields: [agentRunId], references: [id])
+  loopNodeRun       LoopNodeRun?     @relation(fields: [loopNodeRunId], references: [id])
+  automationGrant   AutomationGrant? @relation(fields: [automationGrantId], references: [id])
+
+  @@index([projectId, status, createdAt])
+  @@index([taskId, status])
+  @@index([loopNodeRunId, status])
+  @@index([automationGrantId, status])
+}
+
+model Artifact {
+  id            String       @id @db.VarChar(96)
+  projectId     String       @db.VarChar(64)
+  taskId        String?      @db.VarChar(96)
+  agentRunId    String?      @db.VarChar(96)
+  loopNodeRunId String?      @db.VarChar(96)
+  type          String       @db.VarChar(32)
+  storageKey    String       @unique @db.VarChar(512)
+  checksum      String       @db.VarChar(128)
+  mimeType      String       @db.VarChar(191)
+  byteSize      BigInt
+  metadata      Json
+  createdAt     DateTime     @default(now())
+  project       Project      @relation(fields: [projectId], references: [id])
+  task          Task?        @relation(fields: [taskId], references: [id])
+  agentRun      AgentRun?    @relation(fields: [agentRunId], references: [id])
+  loopNodeRun   LoopNodeRun? @relation(fields: [loopNodeRunId], references: [id])
+
+  @@index([taskId, type, createdAt])
+  @@index([loopNodeRunId, type, createdAt])
+}
+
+model CheckResult {
+  id                String          @id @db.VarChar(128)
+  checkDefinitionId String          @db.VarChar(128)
+  taskId            String          @db.VarChar(96)
+  agentRunId        String?         @db.VarChar(96)
+  status            String          @db.VarChar(32)
+  summary           String          @db.Text
+  artifactId        String?         @db.VarChar(96)
+  evidence          Json
+  startedAt         DateTime
+  finishedAt        DateTime
+  checkDefinition   CheckDefinition @relation(fields: [checkDefinitionId], references: [id])
+  task              Task            @relation(fields: [taskId], references: [id])
+  agentRun          AgentRun?       @relation(fields: [agentRunId], references: [id])
+
+  @@unique([checkDefinitionId, taskId, agentRunId])
+  @@index([taskId, status])
+}
+
+model KnowledgeSource {
+  id            String   @id @db.Char(32)
+  projectDigest String   @db.Char(32)
+  sourceType    String   @db.VarChar(32)
+  sourceDigest  String   @db.Char(32)
+  stableKey     String   @db.VarChar(191)
+  displayName   String   @db.VarChar(191)
+  status        String   @db.VarChar(32)
+  latestVersion Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([projectDigest, sourceType, stableKey])
+  @@index([projectDigest, status])
+}
+
+model KnowledgeSourceRevision {
+  id            String    @id @db.Char(32)
+  sourceId      String    @db.Char(32)
+  sourceVersion Int
+  contentDigest String    @db.Char(32)
+  observedAt    DateTime
+  evidence      Json
+  deletedAt     DateTime?
+  createdAt     DateTime  @default(now())
+
+  @@unique([sourceId, sourceVersion])
+  @@index([sourceId, observedAt])
+}
+
+model KnowledgePolicy {
+  id                      String   @id @db.Char(32)
+  projectId               String?  @db.VarChar(64)
+  projectDigest           String   @unique @db.Char(32)
+  autoPublishEnabled      Boolean  @default(false)
+  minimumConfidence       Float    @default(0.9)
+  allowedSourceTypes      Json
+  allowedEntryTypes       Json
+  sourceTypeOverrides     Json
+  allowAutomaticDelete    Boolean  @default(false)
+  allowAutomaticExpire    Boolean  @default(false)
+  allowAutomaticSupersede Boolean  @default(false)
+  scheduleTimezone        String   @default("Asia/Shanghai") @db.VarChar(64)
+  scheduleRule            String?  @db.VarChar(512)
+  fullRebuildEvery        Int      @default(10)
+  subscribeSpaceKnowledge Boolean  @default(false)
+  version                 Int      @default(1)
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+}
+
+model KnowledgeTemplate {
+  id            String   @id @db.Char(32)
+  projectDigest String   @db.Char(32)
+  stableKey     String   @db.VarChar(191)
+  name          String   @db.VarChar(191)
+  mode          String   @db.VarChar(32)
+  status        String   @db.VarChar(32)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  versions KnowledgeTemplateVersion[]
+
+  @@unique([projectDigest, stableKey])
+}
+
+model KnowledgeTemplateVersion {
+  id              String   @id @db.Char(32)
+  templateId      String   @db.Char(32)
+  version         Int
+  content         String   @db.LongText
+  contentHash     String   @db.Char(32)
+  publishedAt     DateTime
+  createdByDigest String   @db.Char(32)
+  createdAt       DateTime @default(now())
+
+  template KnowledgeTemplate @relation(fields: [templateId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+
+  @@unique([templateId, version])
+  @@index([templateId, publishedAt])
+}
+
+model KnowledgeJob {
+  id                   String   @id @db.Char(32)
+  projectDigest        String   @db.Char(32)
+  taskId               String   @db.Char(32)
+  mode                 String   @db.VarChar(32)
+  status               String   @db.VarChar(32)
+  templateVersionId    String   @db.Char(32)
+  policyVersion        Int
+  dedupeKey            String   @unique @db.VarChar(191)
+  sourceSnapshot       Json
+  sourceSnapshotDigest String   @db.Char(32)
+  failureCode          String?  @db.VarChar(64)
+  failureMessage       String?  @db.Text
+  version              Int      @default(1)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  @@index([projectDigest, status, createdAt])
+}
+
+model KnowledgeBatch {
+  id              String    @id @db.Char(32)
+  jobId           String    @db.Char(32)
+  projectDigest   String    @db.Char(32)
+  submissionId    String    @db.Char(32)
+  templateDigest  String    @db.Char(32)
+  status          String    @db.VarChar(32)
+  failedStage     String?   @db.VarChar(32)
+  failureClass    String?   @db.VarChar(32)
+  failureMessage  String?   @db.Text
+  progress        Int       @default(0)
+  processedChunks Int       @default(0)
+  totalChunks     Int       @default(0)
+  retryCount      Int       @default(0)
+  receivedAt      DateTime
+  completedAt     DateTime?
+  version         Int       @default(1)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@unique([jobId, submissionId])
+  @@index([projectDigest, status, receivedAt])
+  @@index([jobId, receivedAt])
+}
+
+model KnowledgeBatchItem {
+  id               String    @id @db.Char(32)
+  batchId          String    @db.Char(32)
+  ordinal          Int
+  stableKey        String    @db.VarChar(191)
+  changeType       String    @db.VarChar(32)
+  sourceType       String    @db.VarChar(32)
+  entryType        String    @db.VarChar(32)
+  title            String    @db.VarChar(191)
+  scope            String    @db.VarChar(32)
+  summary          String    @db.Text
+  bodyMarkdown     String    @db.LongText
+  confidence       Float
+  tags             Json
+  changeSummary    String    @db.Text
+  evidence         Json
+  relations        Json
+  baseVersion      Int?
+  validFrom        DateTime?
+  validUntil       DateTime?
+  decision         String?   @db.VarChar(32)
+  decisionReason   String?   @db.Text
+  publishedVersion Int?
+  createdAt        DateTime  @default(now())
+
+  @@unique([batchId, stableKey, changeType])
+  @@index([batchId, ordinal])
+}
+
+model KnowledgeEntry {
+  id               String   @id @db.Char(32)
+  projectDigest    String   @db.Char(32)
+  stableKey        String   @db.VarChar(191)
+  entryType        String   @db.VarChar(32)
+  scope            String   @db.VarChar(32)
+  status           String   @db.VarChar(32)
+  latestVersion    Int      @default(0)
+  publishedVersion Int?
+  title            String   @db.VarChar(191)
+  searchable       Boolean  @default(false)
+  version          Int      @default(1)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@unique([projectDigest, stableKey])
+  @@index([projectDigest, status, entryType])
+}
+
+model KnowledgeEntryVersion {
+  id                String    @id @db.Char(32)
+  entryId           String    @db.Char(32)
+  version           Int
+  status            String    @db.VarChar(32)
+  title             String    @db.VarChar(191)
+  summary           String    @db.Text
+  bodyMarkdown      String    @db.LongText
+  entryType         String    @db.VarChar(32)
+  scope             String    @db.VarChar(32)
+  tags              Json
+  validFrom         DateTime?
+  validUntil        DateTime?
+  changeSummary     String    @db.Text
+  contentHash       String    @db.Char(32)
+  sourceRefs        Json
+  batchItemId       String    @db.Char(32)
+  publishedByDigest String    @db.Char(32)
+  publishedAt       DateTime
+  createdAt         DateTime  @default(now())
+
+  @@unique([entryId, version])
+  @@index([entryId, status, publishedAt])
+  @@index([batchItemId])
+}
+
+model KnowledgeRelation {
+  id            String    @id @db.Char(32)
+  projectDigest String    @db.Char(32)
+  fromEntryId   String    @db.Char(32)
+  fromVersion   Int
+  toStableKey   String    @db.VarChar(191)
+  toEntryId     String?   @db.Char(32)
+  toVersion     Int?
+  relationType  String    @db.VarChar(32)
+  origin        String    @db.VarChar(16)
+  confidence    Float
+  evidence      Json
+  active        Boolean   @default(true)
+  validFrom     DateTime?
+  validUntil    DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([projectDigest, fromEntryId, active])
+  @@index([projectDigest, toStableKey, active])
+}
+
+model KnowledgeArchitectureView {
+  id            String   @id @db.Char(32)
+  projectDigest String   @db.Char(32)
+  stableKey     String   @db.VarChar(191)
+  title         String   @db.VarChar(191)
+  status        String   @db.VarChar(32)
+  latestVersion Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  versions KnowledgeArchitectureViewVersion[]
+
+  @@unique([projectDigest, stableKey])
+  @@index([projectDigest, status, updatedAt])
+}
+
+model KnowledgeArchitectureViewVersion {
+  id              String   @id @db.Char(32)
+  viewId          String   @db.Char(32)
+  version         Int
+  manifest        Json
+  contentDigest   String   @db.Char(32)
+  bundleObjectKey String   @db.VarChar(512)
+  status          String   @db.VarChar(32)
+  publishedAt     DateTime
+  createdAt       DateTime @default(now())
+
+  view KnowledgeArchitectureView @relation(fields: [viewId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+
+  @@unique([viewId, version])
+  @@index([viewId, status, publishedAt])
+}
+
+model KnowledgeIndexJob {
+  id                 String    @id @db.Char(32)
+  projectDigest      String    @db.Char(32)
+  batchId            String    @db.Char(32)
+  embeddingProfileId String    @db.Char(32)
+  chunkerVersion     String    @db.VarChar(64)
+  indexVersion       Int       @default(1)
+  indexVersionId     String?   @db.Char(32)
+  status             String    @db.VarChar(32)
+  stage              String    @db.VarChar(32)
+  failedStage        String?   @db.VarChar(32)
+  progress           Int       @default(0)
+  processedChunks    Int       @default(0)
+  totalChunks        Int       @default(0)
+  retryCount         Int       @default(0)
+  claimedAt          DateTime?
+  heartbeatAt        DateTime?
+  failureClass       String?   @db.VarChar(32)
+  failureMessage     String?   @db.Text
+  version            Int       @default(1)
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  @@index([status, createdAt])
+  @@index([projectDigest, batchId])
+}
+
+model KnowledgeEmbeddingProfile {
+  id                String   @id @db.Char(32)
+  stableKey         String   @unique @db.VarChar(191)
+  provider          String   @db.VarChar(32)
+  modelId           String   @db.VarChar(191)
+  modelRevision     String   @db.VarChar(191)
+  modelDigest       String   @db.Char(64)
+  tokenizerVersion  String   @db.VarChar(64)
+  dimensions        Int
+  maxSequenceLength Int
+  normalization     String   @db.VarChar(32)
+  quantization      String   @db.VarChar(32)
+  runtimeVersion    String   @db.VarChar(64)
+  threadLimit       Int
+  batchSize         Int
+  localModelPath    String   @db.VarChar(512)
+  status            String   @default("active") @db.VarChar(32)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([status, stableKey])
+}
+
+model KnowledgeIndexVersion {
+  id                 String    @id @db.Char(32)
+  projectDigest      String    @db.Char(32)
+  embeddingProfileId String    @db.Char(32)
+  chunkerVersion     String    @db.VarChar(64)
+  indexVersion       Int       @default(1)
+  collectionName     String    @db.VarChar(191)
+  aliasName          String    @db.VarChar(191)
+  status             String    @db.VarChar(32)
+  pointCount         Int       @default(0)
+  activatedAt        DateTime?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  @@unique([projectDigest, embeddingProfileId, chunkerVersion, indexVersion], map: "KnowledgeIndexVersion_profile_index_key")
+  @@unique([projectDigest, embeddingProfileId, chunkerVersion, collectionName], map: "KnowledgeIndexVersion_profile_collection_key")
+  @@index([projectDigest, status])
+}
+
+model LiveSession {
+  id                    String   @id @db.Char(32)
+  kind                  String   @db.VarChar(16)
+  surface               String   @db.VarChar(16)
+  ownerUserId           String   @db.VarChar(64)
+  spaceId               String   @db.VarChar(96)
+  projectId             String?  @db.VarChar(64)
+  taskId                String?  @db.VarChar(96)
+  modelSiteId           String?  @db.Char(32)
+  model                 String?  @db.VarChar(512)
+  reasoningEffort       String?  @db.VarChar(16)
+  executionPolicy       String   @db.VarChar(16)
+  loopNodeRunId         String?  @db.VarChar(96)
+  loopNodeAttemptId     String?  @db.VarChar(128)
+  leaseGeneration       Int?
+  streamMode            String   @default("tui") @db.VarChar(24)
+  autoCreated           Boolean  @default(false)
+  activeViewerCount     Int      @default(0)
+  targetType            String   @db.VarChar(24)
+  targetDeviceId        String?  @db.VarChar(64)
+  targetWorkerPoolId    String?  @db.Char(32)
+  targetDisplayName     String   @db.VarChar(191)
+  agentProfileId        String?  @db.VarChar(96)
+  businessRunType       String?  @db.VarChar(24)
+  businessRunId         String?  @db.VarChar(96)
+  status                String   @db.VarChar(24)
+  controlState          String   @db.VarChar(16)
+  controlConnectionId   String?  @db.Char(32)
+  controlLeaseExpiresAt DateTime?
+  journalStatus         String   @db.VarChar(24)
+  journalRetentionDays  Int
+  firstSequence         Int      @default(0)
+  lastSequence          Int      @default(0)
+  lastTargetHeartbeatAt DateTime?
+  expiresAt             DateTime
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  @@index([ownerUserId, status, updatedAt])
+  @@index([spaceId, status, updatedAt])
+  @@index([targetWorkerPoolId, status, updatedAt])
+  @@index([expiresAt, status])
+  @@unique([loopNodeAttemptId, leaseGeneration, autoCreated])
+}

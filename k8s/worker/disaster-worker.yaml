@@ -1,0 +1,80 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: humanthread-disaster-worker-state
+  namespace: humanthread
+spec:
+  accessModes: [ReadWriteOnce]
+  resources:
+    requests:
+      storage: 100Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: humanthread-disaster-worker
+  namespace: humanthread
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: humanthread-disaster-worker }
+  template:
+    metadata:
+      labels: { app: humanthread-disaster-worker }
+    spec:
+      nodeName: k8snode18
+      imagePullSecrets:
+        - name: registry-credentials
+      containers:
+        - name: worker
+          image: ghcr.io/humanthreads/humanthread-disaster-worker:__TAG__
+          env:
+            - { name: HT_PLATFORM_URL, value: http://localhost:3000 }
+            - { name: HT_WORKER_POOL_NAME, value: disaster }
+            - { name: HT_WORKER_INSTANCE_ID, value: disaster-01 }
+            - { name: HT_MAX_CONCURRENT_RUNS, value: "2" }
+            - name: HT_WORKER_CAPABILITIES
+              value: '{"workspace":true,"files":true,"commands":true,"gpu":true,"unity":true,"unity_build":true}'
+            - { name: HT_WORKER_HEALTH_PORT, value: "8080" }
+            - { name: HT_GPU_CONCURRENCY, value: "1" }
+            - { name: HT_UNITY_BUILD_CONCURRENCY, value: "1" }
+            - name: HT_WORKER_POOL_TOKEN
+              valueFrom: { secretKeyRef: { name: humanthread-disaster-worker-runtime, key: HT_WORKER_POOL_TOKEN } }
+            - name: HT_GIT_USERNAME
+              valueFrom: { secretKeyRef: { name: humanthread-disaster-worker-runtime, key: HT_GIT_USERNAME, optional: true } }
+            - name: HT_GIT_TOKEN
+              valueFrom: { secretKeyRef: { name: humanthread-disaster-worker-runtime, key: HT_GIT_TOKEN, optional: true } }
+            - name: GIT_AUTHOR_NAME
+              valueFrom: { secretKeyRef: { name: humanthread-disaster-worker-runtime, key: GIT_AUTHOR_NAME, optional: true } }
+            - name: GIT_AUTHOR_EMAIL
+              valueFrom: { secretKeyRef: { name: humanthread-disaster-worker-runtime, key: GIT_AUTHOR_EMAIL, optional: true } }
+            - name: UNITY_LICENSE
+              valueFrom: { secretKeyRef: { name: humanthread-disaster-worker-runtime, key: UNITY_LICENSE } }
+          ports:
+            - name: health
+              containerPort: 8080
+              protocol: TCP
+          livenessProbe:
+            httpGet: { path: /healthz, port: health }
+            initialDelaySeconds: 10
+            periodSeconds: 15
+            timeoutSeconds: 3
+            failureThreshold: 3
+          readinessProbe:
+            httpGet: { path: /readyz, port: health }
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 6
+          volumeMounts:
+            - { name: worker-state, mountPath: /var/lib/humanthread }
+            - { name: worker-tmp, mountPath: /tmp }
+          securityContext: { allowPrivilegeEscalation: false, readOnlyRootFilesystem: true, runAsNonRoot: true, runAsUser: 10001, runAsGroup: 10001 }
+          resources:
+            requests: { cpu: "500m", memory: 8Gi, nvidia.com/gpu: "1" }
+            limits: { cpu: "4", memory: 16Gi, nvidia.com/gpu: "1" }
+      volumes:
+        - name: worker-state
+          persistentVolumeClaim: { claimName: humanthread-disaster-worker-state }
+        - name: worker-tmp
+          emptyDir: {}

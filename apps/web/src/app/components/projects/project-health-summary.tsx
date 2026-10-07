@@ -1,0 +1,7 @@
+import { AlertTriangle, CircleCheck, Flag } from "lucide-react";
+import type { ProjectHubView } from "../../../lib/workbench/workbench-projects";
+import { Callout, KpiCard, Panel } from "../workbench-ui";
+
+export function ProjectHealthSummary({ view }: { view: ProjectHubView }) {
+  return <section className="grid gap-4 lg:grid-cols-[minmax(0,1.35fr)_repeat(3,minmax(140px,0.6fr))]"><Panel title="目标与下一步"><div className="flex gap-3"><Flag className="mt-0.5 size-5 shrink-0 text-[#0969da]" /><div className="min-w-0"><p className="text-sm leading-6 text-[#24292f]">{view.project.objectiveExcerpt ?? "尚未填写项目目标。补充目标后，项目才能形成可追踪的交付判断。"}</p><p className="mt-3 flex items-center gap-2 text-xs font-semibold text-[#0969da]"><CircleCheck size={14} />下一步：{view.health.nextAction}</p></div></div></Panel><KpiCard label="未完成任务" value={view.taskSummary.open} caption="统一任务中心中的项目任务" /><KpiCard label="逾期 / 阻塞" value={`${view.health.overdueTasks} / ${view.health.blockers}`} caption="需要项目负责人处理的信号" /><KpiCard label="下一里程碑" value={view.project.nextMilestone?.name ?? "未设置"} caption={view.project.nextMilestone?.targetAt ? `目标 ${new Intl.DateTimeFormat("zh-CN").format(view.project.nextMilestone.targetAt)}` : "先建立项目路线图"} />{view.health.objectiveState === "missing" ? <div className="lg:col-span-4"><Callout title="项目计划不完整"><span className="inline-flex items-center gap-1"><AlertTriangle size={14} />请补充项目目标，再继续拆分阶段和任务。</span></Callout></div> : null}</section>;
+}

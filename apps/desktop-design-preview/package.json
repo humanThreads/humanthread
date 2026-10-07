@@ -1,0 +1,41 @@
+{
+  "name": "@humanthread/desktop-design-preview",
+  "version": "0.0.0",
+  "license": "AGPL-3.0-only",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -p tsconfig.json --noEmit && vite build",
+    "lint": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "verify:lan": "node scripts/lan-verify.mjs",
+    "verify:visual": "node --experimental-strip-types scripts/visual-verify.mjs"
+  },
+  "dependencies": {
+    "@humanthread/workbench-client": "workspace:*",
+    "@tanstack/react-query": "5.101.4",
+    "lucide-react": "1.25.0",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "react-markdown": "10.1.0",
+    "react-router-dom": "7.18.1",
+    "remark-breaks": "4.0.0",
+    "remark-gfm": "4.0.1",
+    "zod": "4.4.3"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/node": "^20.19.41",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^5.0.0",
+    "jsdom": "^26.1.0",
+    "playwright": "^1.51.1",
+    "typescript": "^5.9.3",
+    "vite": "^8.0.13",
+    "vitest": "^4.1.6"
+  }
+}

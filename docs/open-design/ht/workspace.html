@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HumanThread Web - 我的工作台</title>
+  <link rel="stylesheet" href="assets/base.css">
+</head>
+<body>
+<div class="app-shell">
+  <header class="topbar">
+    <button class="btn btn-ghost" data-toggle-nav>菜单</button>
+    <a class="brand" href="index.html"><span class="brand-mark"></span><span>HumanThread Web</span></a>
+    <div class="search"><input value="搜索任务、项目、文档、成员" aria-label="搜索" readonly></div>
+    <div class="top-actions">
+      <button class="btn" data-copy-text="mcp://humanthread/current-task">复制 MCP 链接</button>
+      <a class="btn" href="downloads.html">下载 Mac 客户端</a>
+      <a class="btn btn-primary" href="#">刷新当前任务</a>
+    </div>
+  </header>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="nav-group">
+        <div class="nav-label">主导航</div>
+        <a class="nav-link active" href="workspace.html"><span class="dot"></span>我的工作台</a>
+        <a class="nav-link" href="team.html"><span class="dot"></span>团队协作</a>
+        <a class="nav-link" href="projects.html"><span class="dot"></span>项目空间</a>
+        <a class="nav-link" href="document-detail.html"><span class="dot"></span>文档</a>
+        <a class="nav-link" href="downloads.html"><span class="dot"></span>客户端</a>
+        <a class="nav-link" href="settings-account.html"><span class="dot"></span>设置</a>
+      </div>
+      <div class="nav-group">
+        <div class="nav-label">公司空间</div>
+        <a class="nav-link" href="#"><span class="dot"></span>华南事业部</a>
+        <a class="nav-link" href="#"><span class="dot"></span>产品中台</a>
+      </div>
+    </aside>
+    <main class="content">
+      <div class="page-head">
+        <div>
+          <h1 class="page-title">我的工作台</h1>
+          <p class="page-subtitle">只聚焦当前任务。所有动作都围绕推进、转交、阻塞和协作上下文展开。</p>
+        </div>
+        <div class="actions">
+          <button class="btn btn-primary" data-task-action="started" data-copy-text="start-task">开始任务</button>
+          <button class="btn" data-task-action="completed">完成任务</button>
+          <button class="btn btn-danger" data-task-action="blocked">阻塞</button>
+          <button class="btn btn-danger" data-task-action="interrupt">中断</button>
+          <button class="btn" data-copy-text="handoff-follow-up">创建跟进</button>
+          <button class="btn" data-copy-text="reassign-task">转交</button>
+          <a class="btn" href="#">打开本地 Agent</a>
+        </div>
+      </div>
+
+      <div class="kpis">
+        <div class="kpi"><div class="label">当前任务</div><div class="value">12</div><div class="delta">3 个在今日窗口内</div></div>
+        <div class="kpi"><div class="label">待转交</div><div class="value">5</div><div class="delta">2 个需要确认</div></div>
+        <div class="kpi"><div class="label">阻塞中</div><div class="value">2</div><div class="delta">其中 1 个等本地 Agent</div></div>
+        <div class="kpi"><div class="label">本地设备</div><div class="value">2</div><div class="delta">Mac / Linux 已绑定</div></div>
+      </div>
+
+      <div class="workbench" style="margin-top:16px;">
+        <section class="canvas">
+          <div class="task-card" data-task-card>
+            <div class="status-line">
+              <span class="pill pill-blue"><span data-status-dot class="status-dot"></span>当前任务</span>
+              <span class="badge" data-task-status>进行中</span>
+              <span class="help">项目：Q2 重点项目池</span>
+            </div>
+            <h3>梳理 7 月项目里程碑与转交责任</h3>
+            <p class="help">统一确认每个任务的负责人、截止时间、阻塞项和后续跟进，保持团队线程状态清晰。</p>
+            <div class="grid cols-2">
+              <div class="panel">
+                <div class="panel-head"><h2 class="panel-title">推进项</h2></div>
+                <div class="panel-body">
+                  <div class="stacked-list">
+                    <div class="mini-item"><strong>补全项目依赖图</strong><span class="help">把外部输入和内部交付串起来</span></div>
+                    <div class="mini-item"><strong>更新负责人</strong><span class="help">为 3 个待办重新分配 owner</span></div>
+                    <div class="mini-item"><strong>发送跟进</strong><span class="help">给刘瑶、张一与本地 Agent 的任务提醒</span></div>
+                  </div>
+                </div>
+              </div>
+              <div class="panel">
+                <div class="panel-head"><h2 class="panel-title">当前上下文</h2></div>
+                <div class="panel-body">
+                  <div class="stack">
+                    <div class="mini-item"><strong>阻塞原因</strong><span class="help">设计确认尚未收到，等待评审</span></div>
+                    <div class="mini-item"><strong>本地 Agent</strong><span class="help">可打开本地目录并继续处理文档</span></div>
+                    <div class="mini-item"><strong>MCP 链接</strong><span class="help">可复制到外部工具链继续推进</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head">
+              <h2 class="panel-title">最近任务流</h2>
+              <div class="tabs" data-tabs>
+                <button class="tab" data-tab="all" aria-selected="true">全部</button>
+                <button class="tab" data-tab="mine">个人空间</button>
+                <button class="tab" data-tab="company">公司空间</button>
+              </div>
+            </div>
+            <div class="panel-body">
+              <div data-tab-panel="all" class="tab-panel">
+                <div class="timeline">
+                  <div class="timeline-item"><div class="timeline-dot"></div><div><strong>整理里程碑</strong><div class="help">刚刚 · 由你发起 · 进入进行中</div></div></div>
+                  <div class="timeline-item"><div class="timeline-dot gray"></div><div><strong>项目评审转交</strong><div class="help">12 分钟前 · 发给刘瑶 · 待确认</div></div></div>
+                  <div class="timeline-item"><div class="timeline-dot gray"></div><div><strong>文档保存</strong><div class="help">28 分钟前 · 版本 14 已生成</div></div></div>
+                </div>
+              </div>
+              <div data-tab-panel="mine" class="tab-panel">
+                <div class="empty">个人空间最近线程会在这里出现。</div>
+              </div>
+              <div data-tab-panel="company" class="tab-panel">
+                <div class="empty">公司空间队列会在这里出现。</div>
+              </div>
+            </div>
+          </div>
+        </section>
+        <aside class="side-stack">
+          <div class="panel">
+            <div class="panel-head"><h2 class="panel-title">快捷动作</h2></div>
+            <div class="panel-body">
+              <div class="stack">
+                <a class="btn btn-primary" href="project-detail.html">打开当前项目</a>
+                <a class="btn" href="team.html">查看团队协作</a>
+                <a class="btn" href="workflow-detail.html">查看工作流详情</a>
+                <a class="btn" href="document-detail.html">编辑最近文档</a>
+              </div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-head"><h2 class="panel-title">设备与工具</h2></div>
+            <div class="panel-body">
+              <div class="stack">
+                <div class="mini-item"><strong>macOS 客户端</strong><span class="help">已安装 · 可唤起本地目录</span></div>
+                <div class="mini-item"><strong>Windows 客户端</strong><span class="help">下载待完成</span></div>
+                <div class="mini-item"><strong>Linux 客户端</strong><span class="help">已授权一台设备</span></div>
+              </div>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </main>
+  </div>
+</div>
+<script src="assets/base.js"></script>
+</body>
+</html>

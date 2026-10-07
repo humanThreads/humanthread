@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">HumanThread</string>
+    <string name="title_activity_main">HumanThread</string>
+    <string name="package_name">com.humanthread.mobile</string>
+    <string name="custom_url_scheme">com.humanthread.mobile</string>
+</resources>

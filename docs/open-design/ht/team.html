@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HumanThread Web - 团队协作</title>
+  <link rel="stylesheet" href="assets/base.css">
+</head>
+<body>
+<div class="app-shell">
+  <header class="topbar">
+    <a class="brand" href="workspace.html"><span class="brand-mark"></span><span>HumanThread Web</span></a>
+    <div class="search"><input value="筛选公司 / 搜索成员" aria-label="筛选" readonly></div>
+    <div class="top-actions">
+      <div class="segmented" data-segmented data-filter-target="#team-members">
+        <button data-filter="all" aria-pressed="true">全部</button>
+        <button data-filter="company">公司空间</button>
+        <button data-filter="personal">个人空间</button>
+      </div>
+      <a class="btn" href="#">转交给此人</a>
+      <a class="btn btn-primary" href="#">查看队列</a>
+    </div>
+  </header>
+  <main class="content">
+    <div class="page-head">
+      <div>
+        <h1 class="page-title">团队协作</h1>
+        <p class="page-subtitle">查看成员当前线程状态、所在公司和等待队列，快速把任务交到合适的人手里。</p>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head"><h2 class="panel-title">成员状态</h2><span class="help">按公司和当前线程过滤</span></div>
+      <div class="list" id="team-members" data-filter-root>
+        <div class="row" data-filter-item data-filter="company">
+          <div>
+            <p class="title">刘瑶</p>
+            <div class="meta">华南事业部 · 正在处理项目评审 · 预计 30 分钟后空闲</div>
+          </div>
+          <div class="dock"><span class="pill pill-blue">可转交</span><a class="btn btn-small" href="#">转交给此人</a></div>
+        </div>
+        <div class="row" data-filter-item data-filter="personal">
+          <div>
+            <p class="title">张一</p>
+            <div class="meta">个人空间 · 文档编辑中 · 等待确认后可接收任务</div>
+          </div>
+          <div class="dock"><span class="pill pill-warn">忙碌</span><a class="btn btn-small" href="#">查看队列</a></div>
+        </div>
+        <div class="row" data-filter-item data-filter="company">
+          <div>
+            <p class="title">陈然</p>
+            <div class="meta">产品中台 · 本地 Agent 在线 · 可接收文档流转</div>
+          </div>
+          <div class="dock"><span class="pill pill-success">在线</span><a class="btn btn-small" href="#">转交给此人</a></div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+<script src="assets/base.js"></script>
+</body>
+</html>

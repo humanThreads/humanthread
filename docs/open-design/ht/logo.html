@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HumanThread Logo System</title>
+  <link rel="stylesheet" href="assets/base.css">
+  <style>
+    .logo-stage {
+      display: grid;
+      gap: 16px;
+      grid-template-columns: 1.2fr .8fr;
+      align-items: stretch;
+    }
+    .logo-hero {
+      min-height: 420px;
+      display: grid;
+      place-items: center;
+      background:
+        linear-gradient(90deg, rgba(208,215,222,.5) 1px, transparent 1px),
+        linear-gradient(180deg, rgba(208,215,222,.5) 1px, transparent 1px),
+        #f6f8fa;
+      background-size: 40px 40px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+    .logo-lockup {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 28px;
+      background: rgba(255,255,255,.88);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+    }
+    .logo-symbol {
+      width: min(420px, 72vw);
+      aspect-ratio: 520 / 300;
+      background: url("assets/humanthread-logo.svg") center / contain no-repeat;
+    }
+    .spec-grid {
+      display: grid;
+      gap: 12px;
+    }
+    .asset-row {
+      display: grid;
+      grid-template-columns: 72px minmax(0, 1fr);
+      gap: 14px;
+      align-items: center;
+      padding: 14px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #fff;
+    }
+    .asset-row.dark {
+      background: #0d1117;
+      color: #e6edf3;
+      border-color: #30363d;
+    }
+    .asset-icon {
+      width: 56px;
+      height: 56px;
+      background: url("assets/humanthread-mark.svg") center / contain no-repeat;
+    }
+    .asset-logo {
+      width: 170px;
+      height: 98px;
+      background: url("assets/humanthread-logo.svg") center / contain no-repeat;
+    }
+    .usage-list {
+      margin: 0;
+      padding-left: 18px;
+      color: var(--fg-muted);
+    }
+    .usage-list li { margin: 6px 0; }
+    @media (max-width: 900px) {
+      .logo-stage { grid-template-columns: 1fr; }
+      .logo-lockup { min-height: 280px; }
+    }
+  </style>
+</head>
+<body>
+<div class="app-shell">
+  <header class="topbar">
+    <a class="brand" href="index.html"><span class="brand-mark"></span><span>HumanThread Web</span></a>
+    <div class="top-actions">
+      <a class="btn" href="index.html">返回入口</a>
+      <a class="btn btn-primary" href="workspace.html">查看工作台</a>
+    </div>
+  </header>
+  <main class="content">
+    <div class="page-head">
+      <div>
+        <h1 class="page-title">HumanThread Logo</h1>
+        <p class="page-subtitle">基于参考图拆解：上方是绳结式 T 图形，下方是全小写 human thread 字标。导航使用独立图形版，品牌展示使用完整图文版。</p>
+      </div>
+    </div>
+
+    <section class="logo-stage">
+      <div class="logo-hero">
+        <div class="logo-lockup">
+          <div class="logo-symbol" aria-hidden="true"></div>
+        </div>
+      </div>
+      <aside class="panel">
+        <div class="panel-head"><h2 class="panel-title">设计规则</h2><span class="badge">source-led</span></div>
+        <div class="panel-body">
+          <ul class="usage-list">
+            <li>图形保留参考图的粗 T 外轮廓，内部以平行线雕表现 thread。</li>
+            <li>文字采用全小写 human thread，字距略放开，保持技术产品的克制感。</li>
+            <li>完整图文版用于登录页、落地页、品牌展示；小尺寸导航只用图形版。</li>
+            <li>配色保留参考图深灰主体，内线加入极浅蓝，避免绿色点缀造成杂乱。</li>
+            <li>后续优化只围绕线距、粗细和字距微调，不再改概念方向。</li>
+          </ul>
+        </div>
+      </aside>
+    </section>
+
+    <section class="panel" style="margin-top:16px;">
+      <div class="panel-head"><h2 class="panel-title">资产预览</h2><span class="help">assets/humanthread-logo.svg</span></div>
+      <div class="panel-body spec-grid">
+        <div class="asset-row">
+          <div class="asset-icon"></div>
+          <div><strong>Symbol mark</strong><div class="help">assets/humanthread-mark.svg，用于导航、favicon、App 图标位。</div></div>
+        </div>
+        <div class="asset-row">
+          <div class="asset-logo"></div>
+          <div><strong>Full lockup</strong><div class="help">assets/humanthread-logo.svg，完整图形 + human thread 字标。</div></div>
+        </div>
+        <div class="asset-row">
+          <div class="brand"><span class="brand-mark"></span><span>HumanThread Web</span></div>
+          <div><strong>Navigation lockup</strong><div class="help">已接入共享 .brand-mark，全站导航位同步生效。</div></div>
+        </div>
+        <div class="asset-row dark">
+          <div class="asset-icon"></div>
+          <div><strong>Dark surface</strong><div style="color:#8b949e;">在桌面 App、Live Activity、深色标题栏里保持可读。</div></div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+</body>
+</html>

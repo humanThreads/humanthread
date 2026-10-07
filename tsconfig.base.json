@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "baseUrl": ".",
+    "paths": {
+      "@humanthread/shared": ["packages/shared/src/index.ts"],
+      "@humanthread/workbench-client": ["packages/workbench-client/src/index.ts"],
+      "@humanthread/workflow-core": ["packages/workflow-core/src/index.ts"],
+      "@humanthread/orchestration-core": ["packages/orchestration-core/src/index.ts"],
+      "@humanthread/cli-wrapper": ["packages/cli-wrapper/src/index.ts"],
+      "@humanthread/db": ["packages/db/src/index.ts"]
+    },
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true
+  }
+}

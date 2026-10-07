@@ -1,0 +1,58 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: humanthread-db-init
+  namespace: humanthread
+  labels:
+    app: humanthread
+    component: db-init
+spec:
+  backoffLimit: 1
+  ttlSecondsAfterFinished: 86400
+  template:
+    metadata:
+      labels:
+        app: humanthread
+        component: db-init
+    spec:
+      restartPolicy: Never
+      imagePullSecrets:
+        - name: registry-credentials
+      containers:
+        - name: db-init
+          image: __IMAGE__
+          imagePullPolicy: IfNotPresent
+          command:
+            - sh
+            - -lc
+            - ./node_modules/.bin/prisma db push --accept-data-loss && node prisma/backfill-spaces.mjs && node prisma/backfill-documents.mjs && node prisma/backfill-document-tree.mjs && node prisma/backfill-orchestration-events.mjs && node prisma/backfill-project-orchestration.mjs && node prisma/backfill-project-roadmap-order.mjs && node prisma/backfill-user-tasks.mjs && node prisma/backfill-task-business-identifiers.mjs && node prisma/backfill-loop-engine.mjs && node prisma/backfill-loop-engine.mjs --apply && node prisma/backfill-loop-engine.mjs && node prisma/backfill-loop-local-config.mjs && node prisma/backfill-loop-local-config.mjs --apply && node prisma/backfill-loop-local-config.mjs && node prisma/backfill-project-worker-resources.mjs && node prisma/backfill-project-worker-resources.mjs --apply && node prisma/backfill-project-worker-resources.mjs && node prisma/backfill-loop-run-snapshots.mjs && node prisma/backfill-loop-run-snapshots.mjs --apply && node prisma/backfill-loop-run-snapshots.mjs && node prisma/backfill-knowledge-domain.mjs && node prisma/backfill-knowledge-domain.mjs --apply && node prisma/backfill-knowledge-domain.mjs && node prisma/seed.mjs
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: humanthread-secrets
+                  key: DATABASE_URL
+            - name: HUMANTHREAD_INITIAL_USER_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: humanthread-secrets
+                  key: HUMANTHREAD_INITIAL_USER_PASSWORD
+                  optional: true
+            - name: HUMANTHREAD_SITE_BASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: humanthread-secrets
+                  key: HUMANTHREAD_SITE_BASE_URL
+                  optional: true
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 1
+              memory: 512Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            runAsUser: 1001
+            runAsGroup: 1001

@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HumanThread Web - 项目空间</title>
+  <link rel="stylesheet" href="assets/base.css">
+</head>
+<body>
+<div class="app-shell">
+  <header class="topbar">
+    <a class="brand" href="workspace.html"><span class="brand-mark"></span><span>HumanThread Web</span></a>
+    <div class="search"><input value="筛选公司 / 搜索项目" aria-label="项目搜索" readonly></div>
+    <div class="top-actions">
+      <div class="segmented">
+        <button aria-pressed="true">全部</button>
+        <button>个人空间</button>
+        <button>公司空间</button>
+      </div>
+      <a class="btn" href="#">新建项目</a>
+    </div>
+  </header>
+  <main class="content">
+    <div class="page-head">
+      <div>
+        <h1 class="page-title">项目空间</h1>
+        <p class="page-subtitle">查看个人和公司的项目，进入项目后可快速进入任务、文档和工作流入口。</p>
+      </div>
+    </div>
+    <div class="grid cols-2">
+      <div class="panel">
+        <div class="panel-head"><h2 class="panel-title">项目列表</h2></div>
+        <div class="list">
+          <div class="row"><div><p class="title">Q2 重点项目池</p><div class="meta">公司空间 · 14 个任务 · 6 份文档 · 3 条工作流</div></div><a class="btn btn-small" href="project-detail.html">进入项目</a></div>
+          <div class="row"><div><p class="title">人事系统重构</p><div class="meta">个人空间 · 7 个任务 · 2 份文档</div></div><a class="btn btn-small" href="project-detail.html">查看任务</a></div>
+          <div class="row"><div><p class="title">客户支持提效</p><div class="meta">公司空间 · 9 个任务 · 4 份文档</div></div><a class="btn btn-small" href="project-detail.html">查看文档</a></div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><h2 class="panel-title">项目操作</h2></div>
+        <div class="panel-body">
+          <div class="stack">
+            <div class="mini-item"><strong>新建项目</strong><span class="help">从空白项目或模板开始</span></div>
+            <div class="mini-item"><strong>筛选公司</strong><span class="help">只显示当前空间相关项目</span></div>
+            <div class="mini-item"><strong>查看任务 / 文档</strong><span class="help">先看项目，再进具体内容</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+<script src="assets/base.js"></script>
+</body>
+</html>

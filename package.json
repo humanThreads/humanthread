@@ -1,0 +1,39 @@
+{
+  "name": "humanthread",
+  "version": "0.1.5",
+  "private": true,
+  "packageManager": "pnpm@10.33.2",
+  "scripts": {
+    "build": "pnpm -r build",
+    "dev": "pnpm --filter @humanthread/web dev",
+    "lint": "pnpm -r lint",
+    "test": "pnpm test:scripts && pnpm -r test",
+    "test:scripts": "node --test scripts/*.test.mjs",
+    "typecheck": "pnpm -r typecheck",
+    "db:generate": "pnpm exec prisma generate",
+    "db:push": "pnpm exec prisma db push",
+    "db:backfill-loop-engine": "node prisma/backfill-loop-engine.mjs",
+    "db:backfill-loop-local-config": "node prisma/backfill-loop-local-config.mjs",
+    "db:backfill-task-business-identifiers": "node prisma/backfill-task-business-identifiers.mjs",
+    "db:backfill-development-modes": "node prisma/backfill-development-modes.mjs",
+    "db:backfill-loop-run-snapshots": "node prisma/backfill-loop-run-snapshots.mjs",
+    "db:backfill-project-worker-resources": "node prisma/backfill-project-worker-resources.mjs",
+    "db:backfill-knowledge-domain": "node prisma/backfill-knowledge-domain.mjs",
+    "db:update-latest-platform-loops": "node prisma/update-latest-platform-loop-graphs.mjs",
+    "db:seed": "node prisma/seed.mjs",
+    "db:business-test:prepare": "node prisma/business-test-environment.mjs"
+  },
+  "devDependencies": {
+    "dotenv": "^17.4.2",
+    "prisma": "^7.8.0",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.16"
+  },
+  "dependencies": {
+    "@prisma/adapter-mariadb": "^7.8.0",
+    "@prisma/client": "^7.8.0",
+    "ali-oss": "6.23.0",
+    "mysql2": "^3.22.3"
+  },
+  "license": "AGPL-3.0-only"
+}

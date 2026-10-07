@@ -1,0 +1,30 @@
+{
+  "name": "@humanthread/project-loop-sync",
+  "version": "0.1.2",
+  "license": "AGPL-3.0-only",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "prebuild": "pnpm --filter @humanthread/shared build",
+    "build": "tsc -p tsconfig.json && node ../../scripts/fix-node-esm-specifiers.mjs dist",
+    "prelint": "pnpm --filter @humanthread/shared build",
+    "lint": "tsc -p tsconfig.json --noEmit",
+    "pretest": "pnpm --filter @humanthread/shared build",
+    "test": "vitest run",
+    "pretypecheck": "pnpm --filter @humanthread/shared build",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "ajv": "8.20.0",
+    "@humanthread/shared": "workspace:*",
+    "yaml": "2.8.1",
+    "zod": "4.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.41",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.16"
+  }
+}

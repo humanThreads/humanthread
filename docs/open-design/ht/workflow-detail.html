@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HumanThread Web - 工作流详情</title>
+  <link rel="stylesheet" href="assets/base.css">
+</head>
+<body>
+<div class="app-shell">
+  <header class="topbar">
+    <a class="brand" href="project-detail.html"><span class="brand-mark"></span><span>HumanThread Web</span></a>
+    <div class="search"><input value="workflow-42" aria-label="工作流" readonly></div>
+    <div class="top-actions">
+      <a class="btn" href="#">刷新时间线</a>
+      <a class="btn" href="#">查看当前任务</a>
+      <a class="btn" href="#">创建跟进</a>
+      <button class="btn btn-primary" data-copy-text="workflow://workflow-42">复制工作流链接</button>
+    </div>
+  </header>
+  <main class="content">
+    <div class="page-head">
+      <div>
+        <h1 class="page-title">项目评审工作流</h1>
+        <p class="page-subtitle">展示时间线和任务流转，帮助团队理解当前卡在哪一步、谁在处理、下一步该做什么。</p>
+      </div>
+    </div>
+    <div class="grid cols-2">
+      <section class="panel">
+        <div class="panel-head"><h2 class="panel-title">时间线</h2><span class="badge">当前节点：评审</span></div>
+        <div class="panel-body">
+          <div class="timeline">
+            <div class="timeline-item"><div class="timeline-dot"></div><div><strong>创建</strong><div class="help">workflow-42 已建立</div></div></div>
+            <div class="timeline-item"><div class="timeline-dot"></div><div><strong>分配</strong><div class="help">刘瑶接收初始任务</div></div></div>
+            <div class="timeline-item"><div class="timeline-dot gray"></div><div><strong>评审</strong><div class="help">等待评审意见回写</div></div></div>
+            <div class="timeline-item"><div class="timeline-dot gray"></div><div><strong>收尾</strong><div class="help">等待版本确认</div></div></div>
+          </div>
+        </div>
+      </section>
+      <section class="stack">
+        <div class="panel">
+          <div class="panel-head"><h2 class="panel-title">当前任务</h2></div>
+          <div class="panel-body">
+            <div class="stack">
+              <div class="mini-item"><strong>确认评审结论</strong><span class="help">负责人：张一</span></div>
+              <div class="mini-item"><strong>创建跟进</strong><span class="help">需要同步给项目工作台</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><h2 class="panel-title">快捷动作</h2></div>
+          <div class="panel-body">
+            <div class="dock">
+              <a class="btn btn-primary" href="#">创建跟进</a>
+              <a class="btn" href="workspace.html">回到工作台</a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+<script src="assets/base.js"></script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+services:
+  db-init:
+    image: ${HUMANTHREAD_IMAGE:?HUMANTHREAD_IMAGE is required}
+    container_name: humanthread-db-init
+    restart: "no"
+    environment:
+      DATABASE_URL: ${DATABASE_URL:?DATABASE_URL is required}
+      HUMANTHREAD_INITIAL_USER_PASSWORD: ${HUMANTHREAD_INITIAL_USER_PASSWORD:-}
+      HUMANTHREAD_SITE_BASE_URL: ${HUMANTHREAD_SITE_BASE_URL:-}
+    command: sh -lc "./node_modules/.bin/prisma db push --accept-data-loss && node prisma/backfill-spaces.mjs && node prisma/backfill-documents.mjs && node prisma/backfill-document-tree.mjs && node prisma/backfill-orchestration-events.mjs && node prisma/backfill-project-orchestration.mjs && node prisma/backfill-project-roadmap-order.mjs && node prisma/backfill-user-tasks.mjs && node prisma/backfill-task-business-identifiers.mjs && node prisma/backfill-loop-engine.mjs && node prisma/backfill-loop-engine.mjs --apply && node prisma/backfill-loop-engine.mjs && node prisma/backfill-loop-local-config.mjs && node prisma/backfill-loop-local-config.mjs --apply && node prisma/backfill-loop-local-config.mjs && node prisma/backfill-project-worker-resources.mjs && node prisma/backfill-project-worker-resources.mjs --apply && node prisma/backfill-project-worker-resources.mjs && node prisma/backfill-loop-run-snapshots.mjs && node prisma/backfill-loop-run-snapshots.mjs --apply && node prisma/backfill-loop-run-snapshots.mjs && node prisma/backfill-knowledge-domain.mjs && node prisma/backfill-knowledge-domain.mjs --apply && node prisma/backfill-knowledge-domain.mjs && node prisma/seed.mjs"

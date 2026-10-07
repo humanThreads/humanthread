@@ -1,0 +1,113 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-07-24T05:46:58Z",
+  "title": "Design System: HumanThread Public Web",
+  "extensions": {
+    "colorMeta": {
+      "signal-green": {
+        "role": "primary",
+        "displayName": "Signal Green",
+        "canonical": "#1f883d",
+        "tonalRamp": ["#0b2a14", "#103c1e", "#155329", "#1a6b32", "#1f883d", "#45a968", "#8ed3a5", "#dff3e5"]
+      },
+      "dispatch-paper": {
+        "role": "neutral",
+        "displayName": "Dispatch Paper",
+        "canonical": "#f4f7f5",
+        "tonalRamp": ["#17201c", "#2c3731", "#46524c", "#68756e", "#929e98", "#bdc7c2", "#dfe5e2", "#f4f7f5"]
+      },
+      "graphite": {
+        "role": "neutral",
+        "displayName": "Graphite",
+        "canonical": "#17201c",
+        "tonalRamp": ["#101713", "#17201c", "#29332e", "#46514b", "#6f7a74", "#a5aea9", "#d7ddda", "#f0f4f2"]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "HumanThread Display",
+        "purpose": "Product name and first-viewport thesis only."
+      },
+      "label": {
+        "displayName": "Dispatch Notation",
+        "purpose": "Stage, task, time, and state notation only."
+      }
+    },
+    "shadows": [],
+    "motion": [
+      {
+        "name": "delivery-sequence",
+        "value": "900ms stage cadence, 4200ms full run, synchronized cursor, progress fill, and bounded handoff pulse",
+        "purpose": "Show assignment, Agent execution, human confirmation, and outcome with visible live stage feedback and explicit replay."
+      },
+      {
+        "name": "control-feedback",
+        "value": "180ms ease",
+        "purpose": "Hover, focus, and active feedback on public controls."
+      }
+    ],
+    "breakpoints": [
+      { "name": "mobile", "value": "767px" },
+      { "name": "compact-desktop", "value": "900px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The single high-priority action on a public section.",
+      "html": "<button class=\"ds-btn-primary\">ENTER WORKBENCH</button>",
+      "css": ".ds-btn-primary { min-height: 46px; padding: 11px 17px; border: 1px solid #1f883d; border-radius: 4px; background: #1f883d; color: #f7faf8; font: 650 14px/1.2 sans-serif; transition: background-color 180ms ease, transform 180ms ease; } .ds-btn-primary:hover { background: #176f31; } .ds-btn-primary:focus-visible { outline: 3px solid rgb(31 136 61 / 35%); outline-offset: 3px; } .ds-btn-primary:active { transform: translateY(1px); }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "A lower-priority public action beside the primary command.",
+      "html": "<button class=\"ds-btn-secondary\">CREATE ACCOUNT</button>",
+      "css": ".ds-btn-secondary { min-height: 46px; padding: 11px 17px; border: 1px solid #9ba8a1; border-radius: 4px; background: #fbfcfb; color: #17201c; font: 650 14px/1.2 sans-serif; transition: border-color 180ms ease, transform 180ms ease; } .ds-btn-secondary:hover { border-color: #17201c; } .ds-btn-secondary:focus-visible { outline: 3px solid rgb(31 136 61 / 35%); outline-offset: 3px; } .ds-btn-secondary:active { transform: translateY(1px); }"
+    },
+    {
+      "name": "Dispatch Node",
+      "kind": "custom",
+      "description": "A real stage on the delivery route, never a decorative status light.",
+      "html": "<span class=\"ds-dispatch-node\" aria-hidden=\"true\"></span>",
+      "css": ".ds-dispatch-node { display: block; width: 12px; height: 12px; border: 2px solid #1f883d; border-radius: 999px; background: #f4f7f5; }"
+    },
+    {
+      "name": "Public Navigation",
+      "kind": "nav",
+      "description": "Solid brand band with account actions and one structural rule.",
+      "html": "<nav class=\"ds-public-nav\"><strong>HumanThread</strong><a href=\"#\">LOGIN</a></nav>",
+      "css": ".ds-public-nav { min-height: 64px; display: flex; align-items: center; gap: 24px; padding: 0 24px; border-bottom: 1px solid #cbd3cf; background: #fbfcfb; color: #17201c; font: 650 14px/1.2 sans-serif; } .ds-public-nav a { margin-left: auto; color: #5d6963; text-decoration: none; } .ds-public-nav a:hover { color: #17201c; } .ds-public-nav a:focus-visible { outline: 3px solid rgb(31 136 61 / 35%); outline-offset: 3px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Delivery Dispatch Graph",
+    "overview": "Public HumanThread surfaces use operational dispatch grammar to make ownership, execution, handoff, and outcome visible. The system is light, precise, low-radius, and flat by default. One signal route connects otherwise separate product stages.",
+    "keyCharacteristics": [
+      "Cool dispatch-paper fields with graphite notation.",
+      "One signal-green route that always represents active progress or action.",
+      "Asymmetric compositions built on explicit tracks and stages.",
+      "Sparse depth, clipped panels, and low-radius controls.",
+      "Motion that explains ownership, handoff, waiting, and completion."
+    ],
+    "rules": [
+      { "name": "The Signal Has Meaning Rule", "body": "Green identifies a current route, action, focus, or confirmed state.", "section": "colors" },
+      { "name": "The Notation Is Not Decoration Rule", "body": "Monospace type is used only for identifiers, time, stages, commands, and state.", "section": "typography" },
+      { "name": "The Route Owns the Grid Rule", "body": "Tracks and stages organize real content; decorative coordinates are not allowed.", "section": "layout" },
+      { "name": "The Flat Operations Rule", "body": "Elevation communicates a temporary foreground or interactive layer.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do let one signal route connect otherwise separate product stages.",
+      "Do keep demonstrations truthful and label authored sample data.",
+      "Do preserve a complete static route under reduced motion."
+    ],
+    "donts": [
+      "Don't turn the public page into a wall of equal feature cards.",
+      "Don't use gradients, glows, glass, or dark terminal motifs as shorthand for AI.",
+      "Don't add route notation without real product meaning."
+    ]
+  }
+}

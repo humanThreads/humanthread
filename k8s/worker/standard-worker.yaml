@@ -1,0 +1,79 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: humanthread-standard-worker-state
+  namespace: humanthread
+spec:
+  accessModes: [ReadWriteOnce]
+  resources:
+    requests:
+      storage: 100Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: humanthread-linux-worker
+  namespace: humanthread
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: humanthread-linux-worker }
+  template:
+    metadata:
+      labels: { app: humanthread-linux-worker }
+    spec:
+      imagePullSecrets:
+        - name: registry-credentials
+      containers:
+        - name: worker
+          image: __IMAGE__
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: HT_PLATFORM_URL
+              value: http://localhost:3000
+            - name: HT_WORKER_POOL_NAME
+              value: standard-linux
+            - name: HT_MAX_CONCURRENT_RUNS
+              value: "2"
+            - name: HT_WORKER_CAPABILITIES
+              value: '{"workspace":true,"files":true,"commands":true}'
+            - name: HT_WORKER_HEALTH_PORT
+              value: "8080"
+            - name: HT_WORKER_POOL_TOKEN
+              valueFrom: { secretKeyRef: { name: humanthread-worker-runtime, key: HT_WORKER_POOL_TOKEN } }
+            - name: HT_GIT_USERNAME
+              valueFrom: { secretKeyRef: { name: humanthread-worker-runtime, key: HT_GIT_USERNAME, optional: true } }
+            - name: HT_GIT_TOKEN
+              valueFrom: { secretKeyRef: { name: humanthread-worker-runtime, key: HT_GIT_TOKEN, optional: true } }
+            - name: GIT_AUTHOR_NAME
+              valueFrom: { secretKeyRef: { name: humanthread-worker-runtime, key: GIT_AUTHOR_NAME, optional: true } }
+            - name: GIT_AUTHOR_EMAIL
+              valueFrom: { secretKeyRef: { name: humanthread-worker-runtime, key: GIT_AUTHOR_EMAIL, optional: true } }
+          ports:
+            - name: health
+              containerPort: 8080
+              protocol: TCP
+          livenessProbe:
+            httpGet: { path: /healthz, port: health }
+            initialDelaySeconds: 10
+            periodSeconds: 15
+            timeoutSeconds: 3
+            failureThreshold: 3
+          readinessProbe:
+            httpGet: { path: /readyz, port: health }
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 6
+          volumeMounts:
+            - { name: worker-state, mountPath: /var/lib/humanthread }
+            - { name: worker-tmp, mountPath: /tmp }
+          securityContext: { allowPrivilegeEscalation: false, readOnlyRootFilesystem: true, runAsNonRoot: true, runAsUser: 10001, runAsGroup: 10001 }
+          resources:
+            requests: { cpu: "2", memory: 8Gi }
+            limits: { cpu: "4", memory: 16Gi }
+      volumes:
+        - name: worker-state
+          persistentVolumeClaim: { claimName: humanthread-standard-worker-state }
+        - name: worker-tmp
+          emptyDir: {}

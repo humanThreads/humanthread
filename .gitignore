@@ -1,0 +1,26 @@
+node_modules
+.next
+dist
+dist-electron
+dist-installers
+coverage
+.env
+.env.*
+!.env.example
+*.log
+.DS_Store
+.superpowers/
+.tmp/
+.worktrees/
+.android-sdk/
+.humanthread/runtime/
+.humanthread/results/
+.humanthread/worktrees/
+
+# HumanThread task execution output and transient test data.
+/artifacts/
+/.humanthread/test-data/
+/test-data/
+
+# Local SSH known-hosts written by release tooling
+.ssh/

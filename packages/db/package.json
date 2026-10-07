@@ -1,0 +1,27 @@
+{
+  "name": "@humanthread/db",
+  "version": "0.1.2",
+  "license": "AGPL-3.0-only",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.json && node ../../scripts/fix-node-esm-specifiers.mjs dist",
+    "lint": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@humanthread/orchestration-core": "workspace:*",
+    "@humanthread/shared": "workspace:*",
+    "@humanthread/workflow-core": "workspace:*",
+    "@prisma/adapter-mariadb": "^7.8.0",
+    "@prisma/client": "^7.8.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.41",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.16"
+  }
+}

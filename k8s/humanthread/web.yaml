@@ -1,0 +1,365 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: humanthread-web
+  namespace: humanthread
+  labels:
+    app: humanthread
+    component: web
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: humanthread
+      component: web
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: humanthread
+        component: web
+    spec:
+      imagePullSecrets:
+        - name: registry-credentials
+      securityContext:
+        fsGroup: 1001
+      containers:
+        - name: humanthread-web
+          image: __IMAGE__
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 3000
+          env:
+            - name: NODE_ENV
+              value: production
+            - name: NEXT_TELEMETRY_DISABLED
+              value: "1"
+            - name: HOSTNAME
+              value: 0.0.0.0
+            - name: PORT
+              value: "3000"
+            - name: HUMANTHREAD_ORCHESTRATION_READS
+              value: "true"
+            - name: HUMANTHREAD_ORCHESTRATION_DISPATCH
+              value: "false"
+            - name: HUMANTHREAD_ORCHESTRATION_LOOP
+              value: "true"
+            - name: HUMANTHREAD_USER_TASKS_READS
+              value: "true"
+            - name: HUMANTHREAD_USER_TASKS_WRITES
+              value: "true"
+            - name: HUMANTHREAD_LOOP_GRAPH_V1
+              value: "true"
+            - name: HUMANTHREAD_LOOP_FAILURE_SHADOW
+              value: "true"
+            - name: HUMANTHREAD_LOOP_FAILURE_ENFORCED
+              value: "false"
+            - name: HUMANTHREAD_LOOP_MOBILE_SOURCE_INTERVENTION
+              value: "true"
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: humanthread-secrets
+                  key: DATABASE_URL
+            - name: HUMANTHREAD_BINDING_CODE_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: humanthread-secrets
+                  key: HUMANTHREAD_BINDING_CODE_SECRET
+            - name: HUMANTHREAD_WEB_SESSION_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: humanthread-secrets
+                  key: HUMANTHREAD_WEB_SESSION_SECRET
+            - name: HUMANTHREAD_DESKTOP_SESSION_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: humanthread-secrets
+                  key: HUMANTHREAD_DESKTOP_SESSION_SECRET
+            - name: HUMANTHREAD_PROJECT_ENVIRONMENT_SECRET_ENCRYPTION_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: humanthread-secrets
+                  key: HUMANTHREAD_PROJECT_ENVIRONMENT_SECRET_ENCRYPTION_KEY
+            - name: HUMANTHREAD_PRIVATE_GIT_HOST_ALLOWLIST
+              valueFrom:
+                secretKeyRef:
+                  name: humanthread-secrets
+                  key: HUMANTHREAD_PRIVATE_GIT_HOST_ALLOWLIST
+                  optional: true
+            - name: HUMANTHREAD_SMTP_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: humanthread-secrets
+                  key: HUMANTHREAD_SMTP_HOST
+            - name: HUMANTHREAD_SITE_BASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: humanthread-secrets
+                  key: HUMANTHREAD_SITE_BASE_URL
+                  optional: true
+            - name: HUMANTHREAD_SMTP_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: humanthread-secrets
+                  key: HUMANTHREAD_SMTP_PORT
+            - name: HUMANTHREAD_SMTP_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: humanthread-secrets
+                  key: HUMANTHREAD_SMTP_USERNAME
+            - name: HUMANTHREAD_SMTP_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: humanthread-secrets
+                  key: HUMANTHREAD_SMTP_PASSWORD
+            - name: HUMANTHREAD_OSS_ENDPOINT
+              valueFrom:
+                secretKeyRef:
+                  name: humanthread-secrets
+                  key: HUMANTHREAD_OSS_ENDPOINT
+            - name: HUMANTHREAD_OSS_REGION
+              valueFrom:
+                secretKeyRef:
+                  name: humanthread-secrets
+                  key: HUMANTHREAD_OSS_REGION
+            - name: HUMANTHREAD_OSS_BUCKET
+              valueFrom:
+                secretKeyRef:
+                  name: humanthread-secrets
+                  key: HUMANTHREAD_OSS_BUCKET
+            - name: HUMANTHREAD_OSS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: humanthread-secrets
+                  key: HUMANTHREAD_OSS_ACCESS_KEY_ID
+            - name: HUMANTHREAD_OSS_ACCESS_KEY_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: humanthread-secrets
+                  key: HUMANTHREAD_OSS_ACCESS_KEY_SECRET
+            - name: HUMANTHREAD_OSS_DOWNLOAD_TTL_SECONDS
+              value: "60"
+            - name: HUMANTHREAD_DOWNLOAD_RATE_LIMIT_MAX
+              value: "5"
+            - name: HUMANTHREAD_DOWNLOAD_RATE_LIMIT_WINDOW_SECONDS
+              value: "60"
+            - name: HUMANTHREAD_REDIS_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: humanthread-secrets
+                  key: HUMANTHREAD_REDIS_HOST
+                  optional: true
+            - name: HUMANTHREAD_REDIS_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: humanthread-secrets
+                  key: HUMANTHREAD_REDIS_PORT
+                  optional: true
+            - name: HUMANTHREAD_REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: humanthread-secrets
+                  key: HUMANTHREAD_REDIS_PASSWORD
+                  optional: true
+            - name: HUMANTHREAD_REDIS_DB
+              valueFrom:
+                secretKeyRef:
+                  name: humanthread-secrets
+                  key: HUMANTHREAD_REDIS_DB
+                  optional: true
+            - name: HUMANTHREAD_REDIS_URL
+              valueFrom:
+                secretKeyRef:
+                  name: humanthread-secrets
+                  key: HUMANTHREAD_REDIS_URL
+                  optional: true
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /api/health/db
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 6
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 1
+              memory: 512Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            runAsUser: 1001
+            runAsGroup: 1001
+          volumeMounts:
+            - name: web-uploads
+              mountPath: /app/apps/web/public/uploads
+            - name: web-downloads
+              mountPath: /app/apps/web/public/downloads
+            - name: web-document-attachments
+              mountPath: /app/apps/web/storage/document-attachments
+            - name: web-task-attachments
+              mountPath: /app/apps/web/storage/task-attachments
+            - name: web-loop-review-artifacts
+              mountPath: /app/apps/web/storage/loop-review-artifacts
+      volumes:
+        - name: web-uploads
+          persistentVolumeClaim:
+            claimName: humanthread-web-uploads
+        - name: web-downloads
+          persistentVolumeClaim:
+            claimName: humanthread-web-downloads
+        - name: web-document-attachments
+          persistentVolumeClaim:
+            claimName: humanthread-web-document-attachments
+        - name: web-task-attachments
+          persistentVolumeClaim:
+            claimName: humanthread-web-task-attachments
+        - name: web-loop-review-artifacts
+          persistentVolumeClaim:
+            claimName: humanthread-web-loop-review-artifacts
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: humanthread-web-uploads
+  namespace: humanthread
+  labels:
+    app: humanthread
+    component: web
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: standard
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: humanthread-web-downloads
+  namespace: humanthread
+  labels:
+    app: humanthread
+    component: web
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: standard
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: humanthread-web-document-attachments
+  namespace: humanthread
+  labels:
+    app: humanthread
+    component: web
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: standard
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: humanthread-web-task-attachments
+  namespace: humanthread
+  labels:
+    app: humanthread
+    component: web
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: standard
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: humanthread-web-loop-review-artifacts
+  namespace: humanthread
+  labels:
+    app: humanthread
+    component: web
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: standard
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: humanthread-web
+  namespace: humanthread
+  labels:
+    app: humanthread
+    component: web
+spec:
+  type: ClusterIP
+  selector:
+    app: humanthread
+    component: web
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: humanthread-web
+  namespace: humanthread
+  labels:
+    app: humanthread
+    component: web
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "900"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "900"
+    nginx.ingress.kubernetes.io/proxy-buffering: "off"
+    nginx.ingress.kubernetes.io/websocket-services: humanthread-live-relay
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: localhost:3000
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: humanthread-web
+                port:
+                  name: http
+          - path: /live-session
+            pathType: Prefix
+            backend:
+              service:
+                name: humanthread-live-relay
+                port:
+                  name: relay

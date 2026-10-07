@@ -1,0 +1,78 @@
+apply plugin: 'com.android.application'
+
+def humanthreadRootPackage = new groovy.json.JsonSlurper().parseText(file("$rootDir/../../../package.json").text)
+def humanthreadVersion = humanthreadRootPackage.version.toString()
+def humanthreadSemver = humanthreadVersion.tokenize('.').collect { it.isInteger() ? it.toInteger() : 0 }
+def humanthreadVersionCode = (humanthreadSemver[0] ?: 0) * 10000 + (humanthreadSemver[1] ?: 0) * 100 + (humanthreadSemver[2] ?: 0)
+
+def humanthreadKeystorePath = System.getenv("HUMANTHREAD_ANDROID_KEYSTORE_PATH")
+def humanthreadKeystorePassword = System.getenv("HUMANTHREAD_ANDROID_KEYSTORE_PASSWORD")
+def humanthreadKeyAlias = System.getenv("HUMANTHREAD_ANDROID_KEY_ALIAS")
+def humanthreadKeyPassword = System.getenv("HUMANTHREAD_ANDROID_KEY_PASSWORD")
+def humanthreadSigningConfigured = humanthreadKeystorePath && humanthreadKeystorePassword && humanthreadKeyAlias && humanthreadKeyPassword
+
+android {
+    namespace = "com.humanthread.mobile"
+    compileSdk = rootProject.ext.compileSdkVersion
+    defaultConfig {
+        applicationId "com.humanthread.mobile"
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode humanthreadVersionCode
+        versionName humanthreadVersion
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        aaptOptions {
+             // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
+             // Default: https://android.googlesource.com/platform/frameworks/base/+/282e181b58cf72b6ca770dc7ca5f91f135444502/tools/aapt/AaptAssets.cpp#61
+            ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
+        }
+    }
+    signingConfigs {
+        release {
+            if (humanthreadSigningConfigured) {
+                storeFile file(humanthreadKeystorePath)
+                storePassword humanthreadKeystorePassword
+                keyAlias humanthreadKeyAlias
+                keyPassword humanthreadKeyPassword
+            }
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            if (humanthreadSigningConfigured) {
+                signingConfig signingConfigs.release
+            }
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+repositories {
+    flatDir{
+        dirs '../capacitor-cordova-android-plugins/src/main/libs', 'libs'
+    }
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation "androidx.appcompat:appcompat:$androidxAppCompatVersion"
+    implementation "androidx.coordinatorlayout:coordinatorlayout:$androidxCoordinatorLayoutVersion"
+    implementation "androidx.core:core-splashscreen:$coreSplashScreenVersion"
+    implementation project(':capacitor-android')
+    testImplementation "junit:junit:$junitVersion"
+    androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
+    androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
+    implementation project(':capacitor-cordova-android-plugins')
+}
+
+apply from: 'capacitor.build.gradle'
+
+try {
+    def servicesJSON = file('google-services.json')
+    if (servicesJSON.text) {
+        apply plugin: 'com.google.gms.google-services'
+    }
+} catch(Exception e) {
+    logger.info("google-services.json not found, google-services plugin not applied. Push Notifications won't work")
+}

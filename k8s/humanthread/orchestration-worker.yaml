@@ -1,0 +1,78 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: humanthread-orchestration-worker
+  namespace: humanthread
+  labels:
+    app: humanthread
+    component: orchestration-worker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: humanthread
+      component: orchestration-worker
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: humanthread
+        component: orchestration-worker
+    spec:
+      imagePullSecrets:
+        - name: registry-credentials
+      containers:
+        - name: orchestration-worker
+          image: __IMAGE__
+          imagePullPolicy: IfNotPresent
+          command: ["node", "apps/orchestration-worker/dist/index.js"]
+          env:
+            - name: NODE_ENV
+              value: production
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: humanthread-secrets
+                  key: DATABASE_URL
+            - name: HUMANTHREAD_ORCHESTRATION_POLL_MS
+              value: "1000"
+            - name: HUMANTHREAD_ORCHESTRATION_DISPATCH
+              value: "false"
+            - name: HUMANTHREAD_ORCHESTRATION_LOOP
+              value: "true"
+            - name: HUMANTHREAD_ORCHESTRATION_SCHEDULED_TASKS
+              value: "false"
+            - name: HUMANTHREAD_TASK_REMINDERS
+              value: "true"
+            - name: HUMANTHREAD_PROJECT_ENVIRONMENT_SECRET_ENCRYPTION_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: humanthread-secrets
+                  key: HUMANTHREAD_PROJECT_ENVIRONMENT_SECRET_ENCRYPTION_KEY
+            - name: HUMANTHREAD_PRIVATE_GIT_HOST_ALLOWLIST
+              valueFrom:
+                secretKeyRef:
+                  name: humanthread-secrets
+                  key: HUMANTHREAD_PRIVATE_GIT_HOST_ALLOWLIST
+                  optional: true
+            - name: HUMANTHREAD_LOOP_GRAPH_V1
+              value: "true"
+            - name: HUMANTHREAD_LOOP_FAILURE_SHADOW
+              value: "true"
+            - name: HUMANTHREAD_LOOP_FAILURE_ENFORCED
+              value: "false"
+            - name: HUMANTHREAD_LOOP_MOBILE_SOURCE_INTERVENTION
+              value: "true"
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            runAsUser: 1001
+            runAsGroup: 1001

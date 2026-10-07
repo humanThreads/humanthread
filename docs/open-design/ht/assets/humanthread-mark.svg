@@ -1,0 +1,36 @@
+<svg width="160" height="160" viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">HumanThread mark</title>
+  <desc id="desc">A dark thread-carved T symbol.</desc>
+  <defs>
+    <linearGradient id="markInk" x1="37" y1="18" x2="124" y2="138" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#4C5358"/>
+      <stop offset="1" stop-color="#272D32"/>
+    </linearGradient>
+    <linearGradient id="threadCut" x1="38" y1="22" x2="124" y2="137" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFFFF"/>
+      <stop offset=".55" stop-color="#EAF8FF"/>
+      <stop offset="1" stop-color="#BFE8FF"/>
+    </linearGradient>
+    <clipPath id="threadT">
+      <path d="M43 30C34 30 27 37 27 47C27 57 35 64 45 64H68V125C68 136 76 144 86 144C96 144 104 136 104 125V64H116C126 64 134 57 134 47C134 37 127 30 118 30H43Z"/>
+    </clipPath>
+  </defs>
+
+  <path d="M43 30C34 30 27 37 27 47C27 57 35 64 45 64H68V125C68 136 76 144 86 144C96 144 104 136 104 125V64H116C126 64 134 57 134 47C134 37 127 30 118 30H43Z" fill="url(#markInk)"/>
+
+  <g clip-path="url(#threadT)" stroke="url(#threadCut)" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M31 51C40 39 62 36 86 44C109 52 125 51 136 38"/>
+    <path d="M31 58C41 46 63 44 86 52C108 59 124 59 136 46"/>
+    <path d="M32 65C43 53 64 52 85 59C107 67 124 66 136 54"/>
+    <path d="M34 72C46 61 65 60 85 67C105 74 121 73 133 63"/>
+
+    <path d="M105 22C94 34 85 48 78 66C70 85 70 105 78 122C82 132 89 140 96 146"/>
+    <path d="M114 25C101 38 92 53 85 70C78 88 78 105 84 119C89 130 95 138 103 144"/>
+    <path d="M124 30C110 42 101 57 94 74C87 90 87 105 92 118C97 128 103 136 112 141"/>
+
+    <path d="M76 65C90 77 101 91 104 107C107 125 101 139 88 149"/>
+    <path d="M84 65C100 77 111 93 114 110C118 128 110 143 95 152"/>
+  </g>
+
+  <path d="M43 30C34 30 27 37 27 47C27 57 35 64 45 64H68V125C68 136 76 144 86 144C96 144 104 136 104 125V64H116C126 64 134 57 134 47C134 37 127 30 118 30H43Z" stroke="#161B22" stroke-width="2.2" opacity=".16"/>
+</svg>

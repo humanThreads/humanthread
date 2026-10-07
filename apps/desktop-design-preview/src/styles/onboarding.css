@@ -1,0 +1,335 @@
+.onboarding-page {
+  display: grid;
+  min-height: calc(100dvh - var(--topbar-height) - 36px);
+  grid-template-columns: 250px minmax(0, 1fr);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  overflow: hidden;
+}
+
+.onboarding-steps {
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  flex-direction: column;
+  border-right: 1px solid var(--border);
+  background: var(--surface-subtle);
+}
+
+.onboarding-steps > header {
+  display: grid;
+  gap: 10px;
+  border-bottom: 1px solid var(--border);
+  padding: 16px;
+}
+
+.onboarding-steps > header strong,
+.onboarding-steps > header span {
+  display: block;
+}
+
+.onboarding-steps > header strong {
+  font-size: 14px;
+}
+
+.onboarding-steps > header span {
+  margin-top: 3px;
+  color: var(--text-muted);
+  font-size: 11px;
+}
+
+.onboarding-steps ol {
+  display: grid;
+  min-height: 0;
+  flex: 1;
+  gap: 3px;
+  overflow-y: auto;
+  margin: 0;
+  padding: 10px;
+  list-style: none;
+}
+
+.onboarding-steps li button {
+  display: flex;
+  width: 100%;
+  min-height: 48px;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  background: transparent;
+  cursor: pointer;
+  padding: 7px 8px;
+  text-align: left;
+}
+
+.onboarding-steps li button:hover {
+  background: var(--surface-hover);
+}
+
+.onboarding-steps li button[aria-current="step"] {
+  border-color: color-mix(in srgb, var(--brand) 28%, var(--border));
+  background: var(--brand-soft);
+}
+
+.onboarding-step-index {
+  display: grid;
+  width: 26px;
+  height: 26px;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--text-muted);
+}
+
+.onboarding-steps li button[data-status="completed"] .onboarding-step-index {
+  border-color: var(--success);
+  color: var(--success);
+}
+
+.onboarding-steps li button[data-status="blocked"] .onboarding-step-index {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+.onboarding-steps li button[data-status="needs_verification"] .onboarding-step-index {
+  border-color: var(--warning);
+  color: var(--warning);
+}
+
+.onboarding-steps li button > span:last-child {
+  min-width: 0;
+}
+
+.onboarding-steps li button strong,
+.onboarding-steps li button small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.onboarding-steps li button strong {
+  font-size: 12px;
+}
+
+.onboarding-steps li button small {
+  margin-top: 2px;
+  color: var(--text-muted);
+  font-size: 10px;
+}
+
+.onboarding-steps > .ghost-button {
+  margin: 10px;
+}
+
+.onboarding-main {
+  min-width: 0;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 22px;
+}
+
+.onboarding-title {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.onboarding-title span {
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 650;
+}
+
+.onboarding-title h1 {
+  margin: 4px 0 0;
+}
+
+.execution-risk-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  border: 1px solid color-mix(in srgb, var(--danger) 32%, var(--border));
+  border-radius: var(--radius);
+  background: var(--danger-soft);
+  color: var(--danger);
+  padding: 10px 12px;
+}
+
+.execution-risk-banner span {
+  flex: 1;
+  line-height: 1.45;
+}
+
+.onboarding-content-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 280px;
+  gap: 16px;
+  align-items: start;
+}
+
+.onboarding-section {
+  display: grid;
+  gap: 16px;
+  padding: 18px;
+}
+
+.onboarding-section h2 {
+  margin: 0;
+}
+
+.definition-list {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.definition-list > div {
+  display: grid;
+  grid-template-columns: 110px minmax(0, 1fr);
+  gap: 12px;
+  border-bottom: 1px solid var(--border);
+  padding: 9px 10px;
+}
+
+.definition-list > div:last-child {
+  border-bottom: 0;
+}
+
+.definition-list dt {
+  color: var(--text-muted);
+}
+
+.definition-list dd {
+  min-width: 0;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.choice-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 8px;
+}
+
+.choice-grid label,
+.check-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface-subtle);
+  padding: 10px;
+  line-height: 1.4;
+}
+
+.choice-grid label span,
+.check-row small {
+  display: block;
+  margin-top: 3px;
+  color: var(--text-muted);
+  font-size: 11px;
+}
+
+.check-row > span {
+  min-width: 0;
+}
+
+.check-row strong,
+.check-row small {
+  display: block;
+}
+
+.two-column-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.check-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.check-list li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-secondary);
+}
+
+.onboarding-evidence {
+  display: grid;
+  gap: 9px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface-subtle);
+  padding: 15px;
+}
+
+.onboarding-evidence h2 {
+  margin: 0;
+}
+
+.onboarding-evidence p {
+  margin: 0;
+  line-height: 1.5;
+}
+
+.evidence-note {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text-secondary);
+  padding: 9px;
+  line-height: 1.5;
+}
+
+.onboarding-evidence small {
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+@media (max-width: 1180px) {
+  .onboarding-page {
+    grid-template-columns: 220px minmax(0, 1fr);
+  }
+
+  .onboarding-content-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 760px) {
+  .onboarding-page {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .onboarding-steps {
+    max-height: 250px;
+    border-right: 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .onboarding-main {
+    padding: 16px;
+  }
+
+  .two-column-fields,
+  .definition-list > div {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

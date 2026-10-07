@@ -1,0 +1,38 @@
+<svg width="520" height="300" viewBox="0 0 520 300" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">human thread logo</title>
+  <desc id="desc">A thread-carved T symbol above the lowercase words human thread.</desc>
+  <defs>
+    <linearGradient id="markInk" x1="182" y1="38" x2="336" y2="217" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#4C5358"/>
+      <stop offset="1" stop-color="#272D32"/>
+    </linearGradient>
+    <linearGradient id="threadCut" x1="184" y1="42" x2="338" y2="216" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFFFF"/>
+      <stop offset=".55" stop-color="#EAF8FF"/>
+      <stop offset="1" stop-color="#BFE8FF"/>
+    </linearGradient>
+    <clipPath id="threadT">
+      <path d="M189 58C177 58 166 68 166 82C166 96 177 106 192 106H233V201C233 217 245 229 260 229C275 229 287 217 287 201V106H328C343 106 354 96 354 82C354 68 343 58 331 58H189Z"/>
+    </clipPath>
+  </defs>
+
+  <path d="M189 58C177 58 166 68 166 82C166 96 177 106 192 106H233V201C233 217 245 229 260 229C275 229 287 217 287 201V106H328C343 106 354 96 354 82C354 68 343 58 331 58H189Z" fill="url(#markInk)"/>
+
+  <g clip-path="url(#threadT)" stroke="url(#threadCut)" stroke-width="5.2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M173 88C185 70 217 67 252 79C290 92 323 91 342 70"/>
+    <path d="M173 96C187 78 218 76 251 87C288 99 321 99 343 79"/>
+    <path d="M174 104C190 86 219 84 250 95C286 107 319 106 342 88"/>
+    <path d="M177 111C194 95 221 93 249 103C282 114 314 114 337 98"/>
+
+    <path d="M306 46C289 62 276 83 265 108C253 136 253 164 265 188C272 202 280 213 291 222"/>
+    <path d="M318 50C299 67 286 88 275 113C263 140 263 163 273 184C280 199 289 211 301 220"/>
+    <path d="M330 57C309 74 296 94 285 119C274 143 274 163 282 181C289 196 298 207 310 216"/>
+
+    <path d="M246 105C267 122 281 141 286 163C292 188 284 211 265 229"/>
+    <path d="M257 104C279 121 294 142 299 166C305 192 296 215 274 232"/>
+  </g>
+
+  <path d="M189 58C177 58 166 68 166 82C166 96 177 106 192 106H233V201C233 217 245 229 260 229C275 229 287 217 287 201V106H328C343 106 354 96 354 82C354 68 343 58 331 58H189Z" stroke="#161B22" stroke-width="2.5" opacity=".16"/>
+
+  <text x="260" y="276" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif" font-size="44" font-weight="400" letter-spacing="1.5" fill="#2F353A">human thread</text>
+</svg>

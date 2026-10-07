@@ -1,0 +1,44 @@
+appId: com.humanthread.localagent
+productName: HumanThread Desktop
+directories:
+  output: dist-installers
+  buildResources: build-resources
+files:
+  - dist/**/*
+  - dist-electron/**/*
+  - package.json
+  - "!node_modules/**/*"
+asar: true
+protocols:
+  - name: HumanThread
+    schemes:
+      - humanthread
+mac:
+  category: public.app-category.productivity
+  icon: build-resources/icon.icns
+  identity: "-"
+  hardenedRuntime: false
+  target:
+    - target: dmg
+      arch:
+        - arm64
+  artifactName: HumanThread-Desktop-${version}-mac-${arch}.${ext}
+linux:
+  category: Utility
+  executableName: humanthread-desktop
+  icon: build-resources/icon.png
+  target:
+    - target: AppImage
+      arch:
+        - x64
+  artifactName: HumanThread-Desktop-${version}-linux-${arch}.${ext}
+win:
+  icon: build-resources/icon.ico
+  target:
+    - target: msi
+      arch:
+        - x64
+  artifactName: HumanThread-Desktop-${version}-windows-${arch}.${ext}
+msi:
+  oneClick: false
+  perMachine: false

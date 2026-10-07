@@ -1,0 +1,63 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: humanthread-db-schema-sync
+  namespace: humanthread
+  labels:
+    app: humanthread
+    component: db-schema-sync
+spec:
+  backoffLimit: 1
+  ttlSecondsAfterFinished: 86400
+  template:
+    metadata:
+      labels:
+        app: humanthread
+        component: db-schema-sync
+    spec:
+      restartPolicy: Never
+      imagePullSecrets:
+        - name: registry-credentials
+      containers:
+        - name: db-schema-sync
+          image: __IMAGE__
+          imagePullPolicy: IfNotPresent
+          # Structure only. The legacy backfills in humanthread-db-init are a
+          # one-time migration and are not re-run on every release, because
+          # already-migrated rows can fail their pre-migration guards.
+          command:
+            - sh
+            - -lc
+            - |
+              set -e
+              ./node_modules/.bin/prisma db push --accept-data-loss
+              # MySQL 8.0 accepts `ADD COLUMN ... JSON NOT NULL` on a populated
+              # table but leaves existing rows NULL rather than backfilling. The
+              # model readers expect an array, so normalise any NULL that the
+              # schema push left behind. Both statements are idempotent.
+              node -e '
+                import("/app/packages/db/dist/index.js").then(async ({ prisma }) => {
+                  const fixed = await prisma.$executeRawUnsafe("update WorkerModelSite set models = json_array() where models is null");
+                  const fixedSites = await prisma.$executeRawUnsafe("update DeviceAgentRuntimeProfile set modelSites = json_array() where modelSites is null");
+                  console.log(`model site backfill: ${fixed} worker sites, ${fixedSites} runtime profiles`);
+                  await prisma.$disconnect();
+                }).catch((error) => { console.error(error); process.exit(1); });
+              '
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: humanthread-secrets
+                  key: DATABASE_URL
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 1
+              memory: 512Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            runAsUser: 1001
+            runAsGroup: 1001

@@ -1,0 +1,27 @@
+# Project-specific Worker image template.
+# Build this image from an immutable standard Worker image published in the
+# container registry. Keep project source code and all runtime secrets
+# out of the image.
+# Override this immutable example tag for every release.
+ARG STANDARD_IMAGE=ghcr.io/humanthreads/humanthread-linux-worker:20260825104157-fcb632d1
+FROM ${STANDARD_IMAGE}
+
+USER root
+
+# Install only system packages required by this project. Prefer an internal
+# apt mirror and pin versions where the project requires reproducibility.
+# RUN apt-get update \
+#   && apt-get install -y --no-install-recommends <project-packages> \
+#   && rm -rf /var/lib/apt/lists/*
+
+# Copy immutable, non-secret toolchain assets only when they are distributed
+# with the project image. Do not COPY source repositories, .env files, keys,
+# model credentials, Git credentials, or Unity licenses.
+# COPY --from=internal-toolchain:<tag> /opt/toolchain /opt/toolchain
+# ENV PROJECT_TOOLCHAIN_HOME=/opt/toolchain
+
+LABEL org.humanthread.worker.kind="project-derived"
+LABEL org.humanthread.worker.base="humanthread-linux-worker"
+LABEL org.humanthread.worker.project="<project-slug>"
+
+USER humanthread

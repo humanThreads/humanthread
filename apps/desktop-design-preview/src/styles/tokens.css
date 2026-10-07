@@ -1,0 +1,33 @@
+:root {
+  color-scheme: light;
+  --canvas: #eef1f0;
+  --surface: #ffffff;
+  --surface-raised: #ffffff;
+  --surface-subtle: #f5f7f6;
+  --surface-hover: #eef3f1;
+  --sidebar: #f8faf9;
+  --sidebar-strong: #f0f4f2;
+  --border: #d9e0dd;
+  --border-strong: #b9c5c0;
+  --text: #17201d;
+  --text-secondary: #58645f;
+  --text-muted: #76817c;
+  --brand: #087f78;
+  --brand-strong: #066a64;
+  --brand-soft: #dcefed;
+  --info: #2563a7;
+  --info-soft: #e7f0fa;
+  --success: #15734a;
+  --success-soft: #e5f3eb;
+  --warning: #955704;
+  --warning-soft: #fbefd8;
+  --danger: #ad3434;
+  --danger-soft: #fae9e8;
+  --focus: #0a8f87;
+  --shadow-overlay: 0 12px 34px rgb(23 32 29 / 14%);
+  --radius: 6px;
+  --radius-sm: 4px;
+  --sidebar-width: 224px;
+  --sidebar-collapsed-width: 68px;
+  --topbar-height: 56px;
+}

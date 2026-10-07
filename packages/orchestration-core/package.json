@@ -1,0 +1,27 @@
+{
+  "name": "@humanthread/orchestration-core",
+  "version": "0.1.2",
+  "license": "AGPL-3.0-only",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.json && node ../../scripts/fix-node-esm-specifiers.mjs dist",
+    "lint": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@humanthread/shared": "workspace:*",
+    "ajv": "8.20.0",
+    "json-logic-js": "2.0.5"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.41",
+    "@types/json-logic-js": "2.0.8",
+    "fast-check": "4.9.0",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.16"
+  }
+}
