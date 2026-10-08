@@ -1,6 +1,7 @@
 import { mkdir, rm, writeFile } from "node:fs/promises";
 import { basename, dirname, extname, join, resolve } from "node:path";
 import { prisma } from "../../../../../packages/db/src/index";
+import { resolveSourceRepositoryUrl } from "./workbench-source-repository";
 import type { WorkbenchSession } from "./workbench-session";
 
 export const WORKBENCH_AVATAR_ALLOWED_MIME_TYPES = [
@@ -69,6 +70,9 @@ export function getWorkbenchShellLoginProps(
     loginAvatarSrc: buildWorkbenchAvatarSrc(
       session.account?.avatarUrl ?? null,
       session.account?.avatarUpdatedAt ?? null,
+    ),
+    sourceRepositoryUrl: resolveSourceRepositoryUrl(
+      process.env.HUMANTHREAD_SOURCE_REPOSITORY,
     ),
   };
 }

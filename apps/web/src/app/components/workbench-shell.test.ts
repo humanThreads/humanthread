@@ -61,7 +61,29 @@ describe("workbench shell navigation", () => {
     expect(markup).toContain("/search");
     expect(markup).toContain('aria-label="快速创建事项"');
     expect(markup).toContain('aria-label="站内信"');
+    expect(markup).toContain('aria-label="GitHub 开源仓库"');
+    expect(markup).toContain("https://github.com/humanThreads/humanthread");
+    expect(markup).toContain('aria-label="帮助中心"');
+    expect(markup).toContain('href="/help"');
     expect(markup).not.toContain("/brand/humanthread-logo.svg");
+  });
+
+  it("orders GitHub and help immediately before the notification bell", () => {
+    const markup = renderToStaticMarkup(
+      createElement(WorkbenchAppShell, {
+        activeKey: "workbench",
+        title: "我的工作台",
+        subtitle: "当前线程",
+        loginEmail: "owner@example.com",
+      }),
+    );
+
+    const githubIndex = markup.indexOf('aria-label="GitHub 开源仓库"');
+    const helpIndex = markup.indexOf('aria-label="帮助中心"');
+    const bellIndex = markup.indexOf('aria-label="站内信"');
+    expect(githubIndex).toBeGreaterThan(-1);
+    expect(helpIndex).toBeGreaterThan(githubIndex);
+    expect(bellIndex).toBeGreaterThan(helpIndex);
   });
 
   it("keeps the mobile search control icon-only without losing its accessible name", () => {

@@ -2,6 +2,7 @@ import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import {
   buildWorkbenchAvatarSrc,
+  getWorkbenchShellLoginProps,
   resolveWorkbenchAvatarExtension,
   resolveWorkbenchAvatarPublicRoot,
 } from "./workbench-avatar";
@@ -54,5 +55,17 @@ describe("workbench avatar helpers", () => {
         fileName: "avatar.pdf",
       }),
     ).toBeNull();
+  });
+
+  it("includes the GitHub repository in the shared workbench shell props", () => {
+    expect(
+      getWorkbenchShellLoginProps({
+        loginEmail: "owner@example.com",
+      }),
+    ).toMatchObject({
+      loginName: null,
+      loginAvatarSrc: null,
+      sourceRepositoryUrl: "https://github.com/humanThreads/humanthread",
+    });
   });
 });

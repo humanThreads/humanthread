@@ -24,35 +24,17 @@ import Image from "next/image";
 import Link from "next/link";
 import { PublicDeliveryDemo } from "./public-delivery-demo";
 import styles from "./public-home.module.css";
+import { resolveSourceRepositoryUrl } from "../../lib/workbench/workbench-source-repository";
+
+export {
+  DEFAULT_SOURCE_REPOSITORY_URL,
+  SOURCE_REPOSITORY_ENV_KEY,
+  resolveSourceRepositoryUrl,
+} from "../../lib/workbench/workbench-source-repository";
 
 export const HOME_PRIMARY_CTA_HREF = "/login?redirectTo=%2Fdashboard";
 export const HOME_REGISTER_HREF = "/register?redirectTo=%2Fdashboard";
 export const HOME_HELP_HREF = "/help";
-
-/**
- * AGPL-3.0 section 13 requires that users interacting with this service over a
- * network can obtain the corresponding source code. A modified deployment must
- * point this at its own published source; unset falls back to the upstream
- * repository so the default deployment stays compliant.
- */
-export const SOURCE_REPOSITORY_ENV_KEY = "HUMANTHREAD_SOURCE_REPOSITORY";
-
-/** Upstream source repository, used when a deployment does not override it. */
-export const DEFAULT_SOURCE_REPOSITORY_URL = "https://github.com/humanThreads/humanthread";
-
-export function resolveSourceRepositoryUrl(
-  value: string | undefined = process.env.HUMANTHREAD_SOURCE_REPOSITORY
-    ?? DEFAULT_SOURCE_REPOSITORY_URL,
-): string | null {
-  const trimmed = value?.trim();
-  if (!trimmed) return null;
-  try {
-    const url = new URL(trimmed);
-    return url.protocol === "https:" || url.protocol === "http:" ? url.toString() : null;
-  } catch {
-    return null;
-  }
-}
 
 function trimTrailingSlash(value: string): string {
   return value.replace(/\/+$/u, "");

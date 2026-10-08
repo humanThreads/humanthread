@@ -7,6 +7,8 @@ import { Menu, X } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import {
   BellIcon,
+  GitHubIcon,
+  HelpIcon,
   PlusIcon,
   SearchIcon,
   WorkbenchNavIcon,
@@ -164,6 +166,37 @@ function WorkbenchQuickCreateButton({
   );
 }
 
+const WORKBENCH_SOURCE_REPOSITORY_URL = "https://github.com/humanThreads/humanthread";
+
+function WorkbenchHeaderResourceLinks({
+  sourceRepositoryUrl,
+}: {
+  sourceRepositoryUrl?: string | null;
+}) {
+  const repositoryUrl = sourceRepositoryUrl?.trim() || WORKBENCH_SOURCE_REPOSITORY_URL;
+
+  return (
+    <>
+      <a
+        href={repositoryUrl}
+        target="_blank"
+        rel="noreferrer noopener"
+        className="grid h-7 w-7 place-items-center rounded-full transition hover:bg-[#f6f8fa]"
+        aria-label="GitHub 开源仓库"
+      >
+        <GitHubIcon />
+      </a>
+      <Link
+        href="/help"
+        className="grid h-7 w-7 place-items-center rounded-full transition hover:bg-[#f6f8fa]"
+        aria-label="帮助中心"
+      >
+        <HelpIcon />
+      </Link>
+    </>
+  );
+}
+
 interface WorkbenchAppShellProps {
   activeKey: WorkbenchNavKey;
   title: string;
@@ -175,6 +208,7 @@ interface WorkbenchAppShellProps {
   loginName?: string | null;
   loginEmail?: string | null;
   loginAvatarSrc?: string | null;
+  sourceRepositoryUrl?: string | null;
   spaceLabel?: string | null;
   selectedSpaceKey?: string;
   spaceFilters?: WorkbenchUserSpaceFilter[];
@@ -197,6 +231,7 @@ export function WorkbenchAppShell({
   loginName,
   loginEmail,
   loginAvatarSrc,
+  sourceRepositoryUrl,
   selectedSpaceKey,
   spaceFilters = [],
   spaceSwitchPath,
@@ -255,6 +290,9 @@ export function WorkbenchAppShell({
                 {...(quickCreateSelectedProjectId
                   ? { selectedProjectId: quickCreateSelectedProjectId }
                   : {})}
+              />
+              <WorkbenchHeaderResourceLinks
+                {...(sourceRepositoryUrl !== undefined ? { sourceRepositoryUrl } : {})}
               />
               <WorkbenchNotificationLink initialUnreadCount={notificationUnreadCount} />
               <WorkbenchUserMenu
