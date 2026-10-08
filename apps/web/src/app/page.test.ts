@@ -136,3 +136,47 @@ describe("AGPL source repository link", () => {
     expect((markup.match(/<footer[\s\S]*?<\/footer>/u)?.[0] ?? "").match(/<span/g)).toHaveLength(2);
   });
 });
+
+describe("开源入口与快速按钮", () => {
+  beforeEach(() => {
+    cookieGet.mockReset();
+    resolveWorkbenchSession.mockReset();
+    redirect.mockReset();
+  });
+
+  it("在首页头部提供帮助中心与 GitHub 仓库入口", async () => {
+    cookieGet.mockReturnValue(undefined);
+    resolveWorkbenchSession.mockResolvedValue({ loginEmail: null });
+    const markup = renderToStaticMarkup(await Home());
+    expect(markup).toContain('href="/help"');
+    expect(markup).toContain("帮助中心");
+    expect(markup).toContain(`href="${DEFAULT_SOURCE_REPOSITORY_URL}"`);
+    expect(markup).toContain('aria-label="GitHub 仓库"');
+    expect(markup).toContain("GitHub 仓库");
+  });
+
+  it("渲染快速入口，覆盖工作台、帮助、源码与客户端下载", async () => {
+    cookieGet.mockReturnValue(undefined);
+    resolveWorkbenchSession.mockResolvedValue({ loginEmail: null });
+    const markup = renderToStaticMarkup(await Home());
+    expect(markup).toContain('aria-labelledby="quick-access-title"');
+    expect(markup).toContain("进入工作台");
+    expect(markup).toContain("帮助中心");
+    expect(markup).toContain(`${DEFAULT_SOURCE_REPOSITORY_URL}/releases`);
+    expect(markup).toContain(`${DEFAULT_SOURCE_REPOSITORY_URL}/issues`);
+  });
+
+  it("快速入口沿用部署方配置的源码仓库地址", async () => {
+    cookieGet.mockReturnValue(undefined);
+    resolveWorkbenchSession.mockResolvedValue({ loginEmail: null });
+    process.env.HUMANTHREAD_SOURCE_REPOSITORY = "https://example.com/humanthread";
+    try {
+      const markup = renderToStaticMarkup(await Home());
+      expect(markup).toContain('href="https://example.com/humanthread"');
+      expect(markup).toContain("https://example.com/humanthread/releases");
+      expect(markup).not.toContain(DEFAULT_SOURCE_REPOSITORY_URL);
+    } finally {
+      delete process.env.HUMANTHREAD_SOURCE_REPOSITORY;
+    }
+  });
+});

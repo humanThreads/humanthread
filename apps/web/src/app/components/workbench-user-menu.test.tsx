@@ -32,6 +32,7 @@ describe("WorkbenchUserMenu", () => {
     expect(screen.getByText("alice@example.com")).toBeTruthy();
     expect(screen.getByRole("menuitem", { name: "设置中心" }).getAttribute("href")).toBe("/settings");
     expect(screen.getByRole("menuitem", { name: "下载本地 Agent" }).getAttribute("href")).toBe("/downloads");
+    expect(screen.getByRole("menuitem", { name: "帮助中心" }).getAttribute("href")).toBe("/help");
     expect(screen.getByRole("menuitem", { name: "退出登录" })).toBeTruthy();
     expect(screen.queryByText("普通会员")).toBeNull();
     expect(screen.queryByText("Agent 中心")).toBeNull();

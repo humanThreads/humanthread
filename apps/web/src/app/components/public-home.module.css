@@ -87,6 +87,12 @@
   color: var(--graphite);
 }
 
+.navExternal {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
 .pageNav a:focus-visible {
   outline: 3px solid color-mix(in srgb, var(--signal) 35%, transparent);
   outline-offset: 3px;
@@ -234,6 +240,113 @@
   color: var(--steel-text);
   font-size: 13px;
   line-height: 1.5;
+}
+
+.quickAccess {
+  width: min(100% - 40px, 1400px);
+  margin-inline: auto;
+  display: grid;
+  grid-template-columns: minmax(240px, 4fr) minmax(0, 8fr);
+  gap: 40px;
+  align-items: start;
+  border-top: 1px solid var(--track-line);
+  padding-block: 72px;
+}
+
+.quickAccessIntro h2 {
+  max-width: 16ch;
+  margin: 10px 0 12px;
+  font-size: 34px;
+  font-weight: 650;
+  line-height: 1.15;
+}
+
+.quickAccessIntro p {
+  max-width: 34ch;
+  margin: 0;
+  color: var(--steel-text);
+  font-size: 15px;
+  line-height: 1.65;
+}
+
+.quickAccessGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 12px;
+}
+
+.quickAccessItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-height: 96px;
+  border: 1px solid var(--track-line);
+  border-radius: 6px;
+  background: var(--raised-paper);
+  padding: 18px;
+  color: inherit;
+  text-decoration: none;
+  transition: border-color 180ms ease, transform 180ms ease, background-color 180ms ease;
+}
+
+.quickAccessItem:hover {
+  border-color: var(--strong-line);
+  transform: translateY(-2px);
+}
+
+.quickAccessItem:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--signal) 35%, transparent);
+  outline-offset: 3px;
+}
+
+.quickAccessIcon {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--track-line);
+  border-radius: 4px;
+  background: var(--paper);
+  color: var(--signal);
+}
+
+.quickAccessBody {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+}
+
+.quickAccessBody strong {
+  font-size: 15px;
+  font-weight: 650;
+}
+
+.quickAccessBody span {
+  color: var(--steel-text);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+@media (max-width: 900px) {
+  .quickAccess {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+  }
+}
+
+@media (max-width: 820px) {
+  .headerInner,
+  .pageNav {
+    gap: 12px;
+  }
+
+  .pageNav a[href^="#"],
+  .navExternal,
+  .textLink {
+    display: none;
+  }
 }
 
 .heroDemo {

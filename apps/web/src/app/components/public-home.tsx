@@ -2,16 +2,19 @@ import {
   AlertTriangle,
   ArrowRight,
   BrainCircuit,
+  BookOpen,
   Building2,
   Check,
   ChartNoAxesCombined,
   CheckCheck,
   Code2,
+  Download,
   FileText,
   Factory,
   Fingerprint,
   Globe2,
   LockKeyhole,
+  MessageCircleQuestionMark,
   ShieldCheck,
   Sparkles,
   UserRoundCheck,
@@ -24,6 +27,7 @@ import styles from "./public-home.module.css";
 
 export const HOME_PRIMARY_CTA_HREF = "/login?redirectTo=%2Fdashboard";
 export const HOME_REGISTER_HREF = "/register?redirectTo=%2Fdashboard";
+export const HOME_HELP_HREF = "/help";
 
 /**
  * AGPL-3.0 section 13 requires that users interacting with this service over a
@@ -48,6 +52,72 @@ export function resolveSourceRepositoryUrl(
   } catch {
     return null;
   }
+}
+
+function trimTrailingSlash(value: string): string {
+  return value.replace(/\/+$/u, "");
+}
+
+export interface HomeQuickAction {
+  key: string;
+  label: string;
+  description: string;
+  href: string;
+  icon: typeof Code2;
+  external: boolean;
+}
+
+export function buildHomeQuickActions(
+  sourceRepositoryUrl: string | null,
+): readonly HomeQuickAction[] {
+  const actions: HomeQuickAction[] = [
+    {
+      key: "workspace",
+      label: "进入工作台",
+      description: "登录后继续处理任务、Loop 与项目文档。",
+      href: HOME_PRIMARY_CTA_HREF,
+      icon: ArrowRight,
+      external: false,
+    },
+    {
+      key: "help",
+      label: "帮助中心",
+      description: "按功能了解 HumanThread 的概念与使用方式。",
+      href: HOME_HELP_HREF,
+      icon: BookOpen,
+      external: false,
+    },
+  ];
+  if (sourceRepositoryUrl) {
+    const repository = trimTrailingSlash(sourceRepositoryUrl);
+    actions.push(
+      {
+        key: "source",
+        label: "GitHub 仓库",
+        description: "查看源码、架构文档与 AGPL-3.0 许可证。",
+        href: repository,
+        icon: Code2,
+        external: true,
+      },
+      {
+        key: "releases",
+        label: "下载客户端",
+        description: "获取 Desktop、Android 与命令行产物。",
+        href: `${repository}/releases`,
+        icon: Download,
+        external: true,
+      },
+      {
+        key: "issues",
+        label: "问题反馈",
+        description: "在 GitHub Issues 提交缺陷与改进建议。",
+        href: `${repository}/issues`,
+        icon: MessageCircleQuestionMark,
+        external: true,
+      },
+    );
+  }
+  return actions;
 }
 
 export const HOME_PRODUCT_MAP = [
@@ -241,6 +311,7 @@ function ProductPath({ items }: { items: readonly string[] }) {
 
 export function PublicHome() {
   const sourceRepositoryUrl = resolveSourceRepositoryUrl();
+  const quickActions = buildHomeQuickActions(sourceRepositoryUrl);
   return (
     <main className={styles.publicHome}>
       <header className={styles.header}>
@@ -253,6 +324,19 @@ export function PublicHome() {
             <a href="#how-it-works">工作方式</a>
             <a href="#scenarios">适用场景</a>
             <a href="#security">安全与边界</a>
+            <Link href={HOME_HELP_HREF}>帮助中心</Link>
+            {sourceRepositoryUrl ? (
+              <a
+                href={sourceRepositoryUrl}
+                target="_blank"
+                rel="noreferrer noopener"
+                className={styles.navExternal}
+                aria-label="GitHub 仓库"
+              >
+                <Code2 aria-hidden="true" size={15} strokeWidth={1.8} />
+                GitHub
+              </a>
+            ) : null}
           </nav>
           <nav aria-label="账户入口" className={styles.accountNav}>
             <Link href={HOME_PRIMARY_CTA_HREF} className={styles.textLink}>登录</Link>
@@ -281,12 +365,61 @@ export function PublicHome() {
                 <ArrowRight aria-hidden="true" size={18} strokeWidth={1.75} />
               </Link>
               <Link href={HOME_REGISTER_HREF} className={styles.secondaryButton}>创建账号</Link>
+              <Link href={HOME_HELP_HREF} className={styles.secondaryButton}>帮助中心</Link>
+              {sourceRepositoryUrl ? (
+                <a
+                  href={sourceRepositoryUrl}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className={styles.secondaryButton}
+                >
+                  <Code2 aria-hidden="true" size={17} strokeWidth={1.75} />
+                  GitHub 仓库
+                </a>
+              ) : null}
             </div>
             <p className={styles.heroNote}>AI 提高思考和生产效率，人类保留判断和责任。</p>
           </div>
           <div className={styles.heroDemo}>
             <PublicDeliveryDemo stages={PUBLIC_DELIVERY_STAGES} />
           </div>
+        </div>
+      </section>
+
+      <section className={styles.quickAccess} aria-labelledby="quick-access-title">
+        <div className={styles.quickAccessIntro}>
+          <p className={styles.kicker}>QUICK ACCESS</p>
+          <h2 id="quick-access-title">快速进入 HumanThread</h2>
+          <p>从工作台、帮助文档到源码与客户端，常用入口集中在这里。</p>
+        </div>
+        <div className={styles.quickAccessGrid}>
+          {quickActions.map((action) => {
+            const Icon = action.icon;
+            const content = (
+              <>
+                <span className={styles.quickAccessIcon}><Icon aria-hidden="true" size={20} strokeWidth={1.7} /></span>
+                <span className={styles.quickAccessBody}>
+                  <strong>{action.label}</strong>
+                  <span>{action.description}</span>
+                </span>
+              </>
+            );
+            return action.external ? (
+              <a
+                key={action.key}
+                href={action.href}
+                target="_blank"
+                rel="noreferrer noopener"
+                className={styles.quickAccessItem}
+              >
+                {content}
+              </a>
+            ) : (
+              <Link key={action.key} href={action.href} className={styles.quickAccessItem}>
+                {content}
+              </Link>
+            );
+          })}
         </div>
       </section>
 
@@ -473,6 +606,7 @@ export function PublicHome() {
         <div className={styles.finalLinks}>
           <Link href={HOME_PRIMARY_CTA_HREF} className={styles.primaryButton}>进入工作台<ArrowRight aria-hidden="true" size={18} strokeWidth={1.75} /></Link>
           <Link href={HOME_REGISTER_HREF} className={styles.secondaryButton}>创建个人或公司账号</Link>
+          <Link href={HOME_HELP_HREF} className={styles.secondaryButton}>查看帮助中心</Link>
         </div>
       </section>
 
@@ -480,6 +614,7 @@ export function PublicHome() {
         <Image src="/brand/humanthread-mark.svg" alt="" width={24} height={24} />
         <span className={styles.footerName}>HumanThread</span>
         <span className={styles.footerDescription}>Human-guided delivery for Agent work.</span>
+        <Link href={HOME_HELP_HREF} className={styles.footerLink}>帮助中心</Link>
         {sourceRepositoryUrl ? (
           <a href={sourceRepositoryUrl} target="_blank" rel="noreferrer noopener" className={styles.footerLink}>
             源代码（AGPL-3.0）

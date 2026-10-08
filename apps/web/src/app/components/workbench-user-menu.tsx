@@ -1,7 +1,7 @@
 "use client";
 
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
-import { Download, LogOut, Settings } from "lucide-react";
+import { Download, LifeBuoy, LogOut, Settings } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useState, useTransition } from "react";
@@ -210,6 +210,12 @@ export function WorkbenchUserMenu({
             <Link href="/downloads" className={ACCOUNT_MENU_ITEM_CLASS_NAME}>
               <Download size={16} aria-hidden="true" />
               <span>下载本地 Agent</span>
+            </Link>
+          </DropdownMenu.Item>
+          <DropdownMenu.Item asChild>
+            <Link href="/help" className={ACCOUNT_MENU_ITEM_CLASS_NAME}>
+              <LifeBuoy size={16} aria-hidden="true" />
+              <span>帮助中心</span>
             </Link>
           </DropdownMenu.Item>
 
