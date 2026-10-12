@@ -33,7 +33,6 @@ FROM base AS deps
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml prisma.config.ts tsconfig.base.json ./
 COPY apps/web/package.json apps/web/package.json
-COPY apps/local-agent/package.json apps/local-agent/package.json
 COPY apps/orchestration-worker/package.json apps/orchestration-worker/package.json
 COPY apps/live-relay/package.json apps/live-relay/package.json
 COPY packages/cli-wrapper/package.json packages/cli-wrapper/package.json

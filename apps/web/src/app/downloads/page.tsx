@@ -1,10 +1,12 @@
 import { getWorkbenchShellLoginProps } from "../../lib/workbench/workbench-avatar";
+import { redirect } from "next/navigation";
 import { requireWorkbenchSession } from "../../lib/workbench/workbench-route-auth";
 import { WorkbenchShell } from "../components/workbench-shell";
 import { WorkbenchButton } from "../components/workbench-ui";
 import { createOssClient, readOssDownloadConfig } from "../../lib/downloads/oss-client";
 import { readReleaseCatalog, type ReleaseCatalog } from "../../lib/downloads/release-catalog";
 import { DownloadCatalog } from "./download-catalog";
+import { resolveClientDownloadRedirectFromEnv } from "../../lib/workbench/workbench-client-download";
 
 export const dynamic = "force-dynamic";
 
@@ -14,7 +16,20 @@ const EMPTY_CATALOG: ReleaseCatalog = {
   artifacts: {},
 };
 
+/**
+ * Private deployments do not run their own release catalog. Their download
+ * entry points follow this redirect to the official site instead of rendering
+ * an empty catalog.
+ */
+export function resolveDownloadsPageRedirect(
+  env: Record<string, string | undefined>,
+): string | null {
+  return resolveClientDownloadRedirectFromEnv(env);
+}
+
 export default async function DownloadsPage() {
+  const officialRedirect = resolveDownloadsPageRedirect(process.env);
+  if (officialRedirect) redirect(officialRedirect);
   const { session } = await requireWorkbenchSession("/downloads");
   let catalog = EMPTY_CATALOG;
   let catalogError = false;

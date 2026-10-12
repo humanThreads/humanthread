@@ -14,5 +14,3 @@ coverage
 .git
 .superpowers
 .tmp
-apps/local-agent/src-tauri/target
-apps/local-agent/dist

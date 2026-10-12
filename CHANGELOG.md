@@ -1,5 +1,13 @@
 # 更新记录
 
+## 2026-10-13 — 移除客户端源码并统一版本号
+
+- 本仓库不再包含 Desktop（`local-agent`）、Android（`mobile-android`）与桌面设计
+  预览（`desktop-design-preview`）的源码；客户端由官方单独构建与分发。
+- 根包 `humanthread` 版本更新为 `0.1.6`，与本次客户端发行版本保持一致。
+- 私有化部署不再展示本地发行目录：当部署地址不是 `www.humanthread.cn` 时，
+  `/downloads` 与客户端下载入口跳转到 <https://www.humanthread.cn/downloads>。
+
 ## 2026-10-07 — 开源初始化
 
 首次以开源方式发布 HumanThread，代码快照来自内部主干的当前状态，历史记录从本仓库重新开始。
@@ -10,9 +18,6 @@
 | --- | --- |
 | 根包 `humanthread` | 0.1.5 |
 | `@humanthread/web` | 0.1.5 |
-| `@humanthread/local-agent` | 0.1.5 |
-| `@humanthread/mobile-android` | 0.1.5 |
-| `@humanthread/desktop-design-preview` | 0.0.0（设计预览，不参与发布） |
 | `@humanthread/orchestration-worker` | 0.1.2 |
 | `@humanthread/knowledge-indexer-service` | 0.1.2 |
 | 其余 `packages/*` | 0.1.2 |
@@ -44,7 +49,5 @@
 
 | 产物 | 文件 | SHA-256 |
 | --- | --- | --- |
-| Desktop macOS arm64 | `HumanThread-Desktop-0.1.5-mac-arm64.dmg` | 见 Release 说明 |
-| Android universal | `HumanThread-0.1.5-android.apk` | 见 Release 说明 |
 
 产物随附 [NOTICE](NOTICE) 与 [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md)，对应源码见 <https://github.com/humanThreads/humanthread>。

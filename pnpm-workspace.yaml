@@ -4,8 +4,6 @@ packages:
 allowBuilds:
   '@prisma/engines': true
   onnxruntime-node: true
-  electron: true
-  electron-winstaller: true
   esbuild: true
   prisma: true
   sharp: true
